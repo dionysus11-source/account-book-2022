@@ -60,12 +60,12 @@ class accountRepository(IaccountRepository.IaccountRepository):
         datas = self.__make_property(data)
         r = requests.post(url, data=json.dumps(datas), headers=headers).json()
         
-    def __convert_response(self, item):
+    def __makeAccount(self, resp):
         ret = {}
-        ret['분류'] = item['properties']['분류']['select']['name']
-        ret['금액'] = item['properties']['금액']['number']
-        ret['결제일'] = item['properties']['결제일']['date']['start']
-        ret['내용'] = item['properties']['내용']['title'][0]['text']['content']
+        ret['분류'] = resp['properties']['분류']['select']['name']
+        ret['금액'] = resp['properties']['금액']['number']
+        ret['결제일'] = resp['properties']['결제일']['date']['start']
+        ret['내용'] = resp['properties']['내용']['title'][0]['text']['content']
         return account.Account(ret)
 
     def load(self):
@@ -75,5 +75,5 @@ class accountRepository(IaccountRepository.IaccountRepository):
                    "Notion-Version": self.__NOTION_VERSION
         }
         r = requests.post(url, headers=headers).json()
-        ret = list(map(self.__convert_response, r['results']))
+        ret = list(map(self.__makeAccount, r['results']))
         return ret
