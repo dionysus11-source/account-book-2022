@@ -16,7 +16,6 @@ class accountRepository(IaccountRepository.IaccountRepository):
         with open(file_path, "r") as json_file:
             env_data = json.load(json_file)
         self.__DATABASE_ID = env_data['DATABASE_ID']
-        self.__url = f'https://api.notion.com/v1/pages'
         self.__NOTION_KEY = env_data['NOTION_KEY']
         self.__NOTION_VERSION = "2022-02-22"
         pass
@@ -53,12 +52,28 @@ class accountRepository(IaccountRepository.IaccountRepository):
         headers = {"Authorization": f"Bearer {self.__NOTION_KEY}",
                    "Content-Type": "application/json",
                    "Notion-Version": self.__NOTION_VERSION
-                   }
+        }
         body = {
             'sorts': []
         }
+        url = f'https://api.notion.com/v1/pages'
         datas = self.__make_property(data)
-        r = requests.post(self.__url, data=json.dumps(datas), headers=headers).json()
+        r = requests.post(url, data=json.dumps(datas), headers=headers).json()
+        
+    def __convert_response(self, item):
+        ret = {}
+        ret['분류'] = item['properties']['분류']['select']['name']
+        ret['금액'] = item['properties']['금액']['number']
+        ret['결제일'] = item['properties']['결제일']['date']['start']
+        ret['내용'] = item['properties']['내용']['title'][0]['text']['content']
+        return account.Account(ret)
 
     def load(self):
-        print("Loading account")
+        url = f'https://api.notion.com/v1/databases/{self.__DATABASE_ID}/query'
+        headers = {"Authorization": f"Bearer {self.__NOTION_KEY}",
+                   "Content-Type": "application/json",
+                   "Notion-Version": self.__NOTION_VERSION
+        }
+        r = requests.post(url, headers=headers).json()
+        ret = list(map(self.__convert_response, r['results']))
+        return ret
