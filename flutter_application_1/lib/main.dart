@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import './repository/account_repository.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -64,6 +65,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  DateTime selectedDate = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -77,6 +80,26 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              final selected = showDatePicker(
+                  context: context,
+                  initialDate: selectedDate,
+                  firstDate: DateTime(2022),
+                  lastDate: DateTime(2030));
+              selected.then((dateTime) {
+                setState(() {
+                  selectedDate = dateTime as DateTime;
+                });
+              });
+            },
+            child: Text(
+              DateFormat.yMMMEd().format(selectedDate),
+              style: const TextStyle(color: Colors.white),
+            ),
+          )
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
