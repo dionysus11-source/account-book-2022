@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    Future<List> database = initDatabase();
     return MaterialApp(
       title: 'Account Book',
       theme: ThemeData(
@@ -27,13 +28,25 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page', db: database),
     );
+  }
+
+  Future<List> initDatabase() async {
+    print('Load database');
+    String jsonString = await rootBundle.loadString('assets/json/env.json');
+    print(jsonString);
+    final jsonResponse = json.decode(jsonString);
+    var repo = AccountRepository(
+        jsonResponse['DATABASE_ID'], jsonResponse['NOTION_KEY'], '2022-02-22');
+    return repo.load();
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  final Future<List> db;
+  const MyHomePage({Key? key, required this.title, required this.db})
+      : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -96,16 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          print('test');
-          String jsonString =
-              await rootBundle.loadString('assets/json/env.json');
-          print(jsonString);
-          final jsonResponse = json.decode(jsonString);
-          var repo = AccountRepository(jsonResponse['DATABASE_ID'],
-              jsonResponse['NOTION_KEY'], '2022-02-22');
-          repo.load();
-        },
+        onPressed: () async {},
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
