@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/object/account.dart';
 import './repository/account_repository.dart';
+import './object/AccountApplicationService.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
@@ -14,7 +16,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Future<List> database = initDatabase();
+    Future<AccountApplicationService> accountApplicationService =
+        initApplicationService();
+    Future<List> database =
+        accountApplicationService.then((aas) => initDatabase(aas));
     return MaterialApp(
       title: 'Account Book',
       theme: ThemeData(
@@ -29,24 +34,36 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page', db: database),
+      home: MyHomePage(
+          title: 'Flutter Demo Home Page',
+          db: database,
+          applicationservice: accountApplicationService),
     );
   }
 
-  Future<List> initDatabase() async {
+  Future<AccountApplicationService> initApplicationService() async {
     print('Load database');
     String jsonString = await rootBundle.loadString('assets/json/env.json');
     print(jsonString);
     final jsonResponse = json.decode(jsonString);
     var repo = AccountRepository(
         jsonResponse['DATABASE_ID'], jsonResponse['NOTION_KEY'], '2022-02-22');
-    return repo.load();
+    return AccountApplicationService(repo);
+  }
+
+  Future<List> initDatabase(AccountApplicationService acs) async {
+    return acs.load();
   }
 }
 
 class MyHomePage extends StatefulWidget {
   final Future<List> db;
-  const MyHomePage({Key? key, required this.title, required this.db})
+  final Future<AccountApplicationService> applicationservice;
+  const MyHomePage(
+      {Key? key,
+      required this.title,
+      required this.db,
+      required this.applicationservice})
       : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
@@ -64,8 +81,21 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  late TabController controller;
   DateTime selectedDate = DateTime.now();
+  @override
+  void initState() {
+    super.initState();
+    controller = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 setState(() {
                   selectedDate = dateTime as DateTime;
                 });
+                // 가계부 리스트  업데이트 추가
               });
             },
             child: Text(
