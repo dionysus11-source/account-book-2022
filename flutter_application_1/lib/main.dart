@@ -5,6 +5,8 @@ import './repository/account_repository.dart';
 import './object/AccountApplicationService.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'sub/DailyAccount.dart';
+import 'sub/WeeklyResult.dart';
 
 void main() {
   runApp(const MyApp());
@@ -132,36 +134,16 @@ class _MyHomePageState extends State<MyHomePage>
           )
         ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              'test',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
+      body: TabBarView(children: <Widget>[
+        DailyAccount(
+            db: widget.db, applicationservice: widget.applicationservice),
+        WeeklyResult(
+            db: widget.db, applicationservice: widget.applicationservice)
+      ], controller: controller),
+      bottomNavigationBar: TabBar(tabs: <Tab>[
+        Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24)),
+        Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
+      ], controller: controller),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {},
       ), // This trailing comma makes auto-formatting nicer for build methods.

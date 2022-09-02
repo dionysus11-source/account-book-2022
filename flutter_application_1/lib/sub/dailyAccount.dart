@@ -1,4 +1,3 @@
-import 'dart:html';
 import 'package:flutter/material.dart';
 import '../object/AccountApplicationService.dart';
 import '../object/account.dart';
@@ -27,19 +26,21 @@ class _DailyAccountState extends State<DailyAccount> {
         child: FutureBuilder(
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              Account data = snapshot.data as Account;
-              String title = data.category;
+              List<dynamic> data = snapshot.data as List<dynamic>;
+              int length = data.length;
+              String title = data[0].category;
               String content = 'test';
               return ListView.builder(
                 itemBuilder: (context, index) {
                   return Card(
                     elevation: 5,
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    child:
-                        ListTile(title: Text(title), subtitle: Text(content)),
+                    child: ListTile(
+                        title: Text(data[index].category),
+                        subtitle: Text(data[index].content)),
                   );
                 },
-                itemCount: title.length,
+                itemCount: length,
               );
             }
             return Text('No data');
