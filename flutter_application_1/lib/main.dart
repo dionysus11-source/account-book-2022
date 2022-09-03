@@ -156,7 +156,21 @@ class _MyHomePageState extends State<MyHomePage>
         Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
       ], controller: controller),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {},
+        onPressed: () async {
+          //Test
+          Account data = Account(
+              category: '식비',
+              ammount: 1500,
+              date: '2022-09-02',
+              content: '스타벅스');
+          widget.applicationservice
+              .then((value) => {value.save('202209', data)});
+          setState(() {
+            final String dateStr = DateFormat('yyyyMM').format(selectedDate);
+            widget.db =
+                widget.applicationservice.then((val) => val.load(dateStr));
+          });
+        },
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

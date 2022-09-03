@@ -4,7 +4,7 @@ import '../object/account.dart';
 
 abstract class IaccountRepository {
   void load(String databaseId);
-  void save();
+  void save(String databaseId, Account data);
 }
 
 class AccountRepository implements IaccountRepository {
@@ -12,27 +12,6 @@ class AccountRepository implements IaccountRepository {
   String notionVersion = '';
 
   AccountRepository(this.notionKey, this.notionVersion);
-  Future<Map> init(String databaseId) async {
-    String url = 'https://api.notion.com/v1/databases/' + databaseId + '/query';
-    final uri = Uri.parse(url);
-    Map<String, String> headers = {
-      "Authorization": "Bearer " + notionKey,
-      "Content-Type": "application/json",
-      "Notion-Version": notionVersion
-    };
-    http.Response response = await http.post(uri, headers: headers);
-    if (response.statusCode == 200) {
-      //print(json.decode(response.body)['results']);
-      var ret = json
-          .decode(response.body)['results']
-          .map((e) => Account.fromJson(e))
-          .toList();
-      print(ret[0]);
-      return ret;
-    } else {
-      throw Exception('can not get data from notion');
-    }
-  }
 
   @override
   Future<List> load(String databaseId) async {
@@ -58,5 +37,38 @@ class AccountRepository implements IaccountRepository {
   }
 
   @override
-  void save() {}
+  void save(String databaseId, Account data) async {
+    String url = 'https://api.notion.com/v1/pages';
+    final uri = Uri.parse(url);
+    Map<String, String> headers = {
+      "Authorization": "Bearer " + notionKey,
+      "Content-Type": "application/json",
+      "Notion-Version": notionVersion
+    };
+    final body = jsonEncode({
+      'parent': {'database_id': databaseId},
+      'properties': {
+        "내용": {
+          "title": [
+            {
+              "text": {"content": data.content}
+            }
+          ]
+        },
+        "분류": {
+          'select': {'name': data.category}
+        },
+        '금액': {'number': data.ammount},
+        '결제일': {
+          'date': {'start': data.date}
+        }
+      }
+    });
+    http.Response response = await http.post(uri, headers: headers, body: body);
+    if (response.statusCode == 200) {
+      print('Save Success');
+    } else {
+      throw Exception('can not get data from notion');
+    }
+  }
 }
