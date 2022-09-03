@@ -57,14 +57,15 @@ class MyApp extends StatelessWidget {
   }
 
   Future<List> initDatabase(AccountApplicationService acs) async {
-    return acs.load('202207');
+    final String dateStr = DateFormat('yyyyMM').format(DateTime.now());
+    return acs.load(dateStr);
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  final Future<List> db;
-  final Future<AccountApplicationService> applicationservice;
-  const MyHomePage(
+  Future<List> db;
+  Future<AccountApplicationService> applicationservice;
+  MyHomePage(
       {Key? key,
       required this.title,
       required this.db,
@@ -81,7 +82,9 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
-
+  void refesh(String date) {
+    //db = applicationservice.load()
+  }
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -126,6 +129,11 @@ class _MyHomePageState extends State<MyHomePage>
               selected.then((dateTime) {
                 setState(() {
                   selectedDate = dateTime as DateTime;
+                  final String dateStr =
+                      DateFormat('yyyyMM').format(selectedDate);
+                  widget.db = widget.applicationservice
+                      .then((val) => val.load(dateStr));
+                  //widget.db = widget.applicationservice.load(dateStr);
                 });
                 // 가계부 리스트  업데이트 추가
               });
