@@ -116,37 +116,6 @@ class _MyHomePageState extends State<MyHomePage>
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              final selected = showDatePicker(
-                  context: context,
-                  initialDate: selectedDate,
-                  firstDate: DateTime(2022),
-                  lastDate: DateTime(2030));
-              selected.then((dateTime) {
-                setState(() {
-                  selectedDate = dateTime as DateTime;
-                  final String dateStr =
-                      DateFormat('yyyyMM').format(selectedDate);
-                  widget.db = widget.applicationservice
-                      .then((val) => val.load(dateStr));
-                  //widget.db = widget.applicationservice.load(dateStr);
-                });
-                // 가계부 리스트  업데이트 추가
-              });
-            },
-            child: Text(
-              DateFormat.yMMMEd().format(selectedDate),
-              style: const TextStyle(color: Colors.white),
-            ),
-          )
-        ],
-      ),
       body: TabBarView(children: <Widget>[
         DailyAccount(
             db: widget.db, applicationservice: widget.applicationservice),
@@ -157,53 +126,6 @@ class _MyHomePageState extends State<MyHomePage>
         Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24)),
         Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
       ], controller: controller),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          categoryContentConroller = new TextEditingController();
-          await showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('더하기'),
-                  content: Column(children: <Widget>[
-                    TextField(
-                        controller: categoryContentConroller,
-                        keyboardType: TextInputType.text)
-                  ]),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('취소'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Account result = Account(
-                            category: '식비',
-                            ammount: 1500,
-                            date: '2022-09-02',
-                            content: '스타벅스');
-                        widget.applicationservice
-                            .then((value) => {value.save('202209', result)});
-                        Future.delayed(Duration(milliseconds: 1000), () {
-                          setState(() {
-                            final String dateStr =
-                                DateFormat('yyyyMM').format(selectedDate);
-                            widget.db = widget.applicationservice
-                                .then((val) => val.load(dateStr));
-                          });
-                          Navigator.of(context).pop();
-                        });
-                      },
-                      child: const Text('저장'),
-                    ),
-                  ],
-                );
-              });
-        },
-        child: const Icon(Icons.edit),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
