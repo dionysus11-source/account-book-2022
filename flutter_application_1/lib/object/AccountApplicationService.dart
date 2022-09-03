@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 
 class AccountApplicationService {
   IaccountRepository accountRepository;
-  AccountApplicationService(this.accountRepository);
-  Future<List> load() async {
-    return accountRepository.load() as Future<List>;
+  Map databaseInfo;
+  AccountApplicationService(this.accountRepository, this.databaseInfo);
+  Future<List> load(String date) async {
+    String databaseId = databaseInfo[date];
+    return accountRepository.load(databaseId) as Future<List>;
   }
 }

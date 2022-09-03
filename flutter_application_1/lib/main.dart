@@ -48,13 +48,16 @@ class MyApp extends StatelessWidget {
     String jsonString = await rootBundle.loadString('assets/json/env.json');
     print(jsonString);
     final jsonResponse = json.decode(jsonString);
-    var repo = AccountRepository(
-        jsonResponse['DATABASE_ID'], jsonResponse['NOTION_KEY'], '2022-02-22');
-    return AccountApplicationService(repo);
+    String databaseString =
+        await rootBundle.loadString('assets/json/database_info.json');
+    final databaseInfo = json.decode(databaseString);
+    print(databaseInfo);
+    var repo = AccountRepository(jsonResponse['NOTION_KEY'], '2022-02-22');
+    return AccountApplicationService(repo, databaseInfo);
   }
 
   Future<List> initDatabase(AccountApplicationService acs) async {
-    return acs.load();
+    return acs.load('202207');
   }
 }
 

@@ -27,23 +27,32 @@ class _DailyAccountState extends State<DailyAccount> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<dynamic> data = snapshot.data as List<dynamic>;
+
+              data.sort((a, b) {
+                return a.date
+                    .toString()
+                    .toLowerCase()
+                    .compareTo(b.date.toString().toLowerCase());
+              });
+              data = data.reversed.toList();
               int length = data.length;
-              String title = data[0].category;
-              String content = 'test';
               return ListView.builder(
                 itemBuilder: (context, index) {
                   return Card(
                     elevation: 5,
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: ListTile(
-                        title: Text(data[index].category),
-                        subtitle: Text(data[index].content)),
+                      title: Text(data[index].content),
+                      subtitle: Text(data[index].category),
+                      leading: Text(data[index].date),
+                      trailing: Text(data[index].ammount.toString() + '원'),
+                    ),
                   );
                 },
                 itemCount: length,
               );
             }
-            return Text('No data');
+            return const Text('No data');
           },
           future: widget.db,
         ),
