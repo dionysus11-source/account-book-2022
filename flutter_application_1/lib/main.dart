@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'sub/DailyAccount.dart';
 import 'sub/WeeklyResult.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(
-          title: 'Flutter Demo Home Page',
+          title: '공이와 묭이의 가계부',
           db: database,
           applicationservice: accountApplicationService),
     );
@@ -93,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   late TabController controller;
   DateTime selectedDate = DateTime.now();
+  late TextEditingController categoryContentConroller;
   @override
   void initState() {
     super.initState();
@@ -157,20 +159,50 @@ class _MyHomePageState extends State<MyHomePage>
       ], controller: controller),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          //Test
-          Account data = Account(
-              category: '식비',
-              ammount: 1500,
-              date: '2022-09-02',
-              content: '스타벅스');
-          widget.applicationservice
-              .then((value) => {value.save('202209', data)});
-          setState(() {
-            final String dateStr = DateFormat('yyyyMM').format(selectedDate);
-            widget.db =
-                widget.applicationservice.then((val) => val.load(dateStr));
-          });
+          categoryContentConroller = new TextEditingController();
+          await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('더하기'),
+                  content: Column(children: <Widget>[
+                    TextField(
+                        controller: categoryContentConroller,
+                        keyboardType: TextInputType.text)
+                  ]),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('취소'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Account result = Account(
+                            category: '식비',
+                            ammount: 1500,
+                            date: '2022-09-02',
+                            content: '스타벅스');
+                        widget.applicationservice
+                            .then((value) => {value.save('202209', result)});
+                        Future.delayed(Duration(milliseconds: 1000), () {
+                          setState(() {
+                            final String dateStr =
+                                DateFormat('yyyyMM').format(selectedDate);
+                            widget.db = widget.applicationservice
+                                .then((val) => val.load(dateStr));
+                          });
+                          Navigator.of(context).pop();
+                        });
+                      },
+                      child: const Text('저장'),
+                    ),
+                  ],
+                );
+              });
         },
+        child: const Icon(Icons.edit),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

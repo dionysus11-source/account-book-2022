@@ -29,7 +29,9 @@ class AccountRepository implements IaccountRepository {
           .decode(response.body)['results']
           .map((e) => Account.fromJson(e))
           .toList();
-      print(ret[0]);
+      if (ret.length != 0) {
+        print(ret[0].content);
+      }
       return ret;
     } else {
       throw Exception('can not get data from notion');
