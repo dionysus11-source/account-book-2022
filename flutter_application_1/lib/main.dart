@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import './repository/account_repository.dart';
+import './object/AccountApplicationService.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
+import 'sub/DailyAccount.dart';
+import 'sub/WeeklyResult.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -13,6 +18,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    Future<AccountApplicationService> accountApplicationService =
+        initApplicationService();
+    Future<List> database =
+        accountApplicationService.then((aas) => initDatabase(aas));
     return MaterialApp(
       title: 'Account Book',
       theme: ThemeData(
@@ -27,13 +36,38 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(
+          title: '공이와 묭이의 가계부',
+          db: database,
+          applicationservice: accountApplicationService),
     );
+  }
+
+  Future<AccountApplicationService> initApplicationService() async {
+    String jsonString = await rootBundle.loadString('assets/json/env.json');
+    final jsonResponse = json.decode(jsonString);
+    String databaseString =
+        await rootBundle.loadString('assets/json/database_info.json');
+    final databaseInfo = json.decode(databaseString);
+    var repo = AccountRepository(jsonResponse['NOTION_KEY'], '2022-02-22');
+    return AccountApplicationService(repo, databaseInfo);
+  }
+
+  Future<List> initDatabase(AccountApplicationService acs) async {
+    final String dateStr = DateFormat('yyyyMM').format(DateTime.now());
+    return acs.load(dateStr);
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  Future<List> db;
+  Future<AccountApplicationService> applicationservice;
+  MyHomePage(
+      {Key? key,
+      required this.title,
+      required this.db,
+      required this.applicationservice})
+      : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -45,12 +79,30 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
-
+  void refesh(String date) {
+    //db = applicationservice.load()
+  }
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  late TabController controller;
+  DateTime selectedDate = DateTime.now();
+  late TextEditingController categoryContentConroller;
+  @override
+  void initState() {
+    super.initState();
+    controller = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -60,53 +112,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              'test',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          print('test');
-          String jsonString =
-              await rootBundle.loadString('assets/json/env.json');
-          print(jsonString);
-          final jsonResponse = json.decode(jsonString);
-          var repo = AccountRepository(jsonResponse['DATABASE_ID'],
-              jsonResponse['NOTION_KEY'], '2022-02-22');
-          repo.load();
-        },
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: TabBarView(children: <Widget>[
+        DailyAccount(
+            db: widget.db, applicationservice: widget.applicationservice),
+        WeeklyResult(
+            db: widget.db, applicationservice: widget.applicationservice)
+      ], controller: controller),
+      bottomNavigationBar: TabBar(tabs: <Tab>[
+        Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24)),
+        Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
+      ], controller: controller),
     );
   }
 }
