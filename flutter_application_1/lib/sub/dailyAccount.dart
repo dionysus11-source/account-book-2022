@@ -13,16 +13,24 @@ class DailyAccount extends StatefulWidget {
 }
 
 class _DailyAccountState extends State<DailyAccount> {
-  late TextEditingController categoryContentConroller;
+  late TextEditingController contentConroller;
+  late TextEditingController amountConroller;
   DateTime selectedDate = DateTime.now();
+  String _category = '식비';
+
   @override
   void initState() {
     super.initState();
   }
 
+  void _onValueChange(String value) {
+    setState(() {
+      _category = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('test');
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -43,7 +51,6 @@ class _DailyAccountState extends State<DailyAccount> {
                       DateFormat('yyyyMM').format(selectedDate);
                   widget.db = widget.applicationservice
                       .then((val) => val.load(dateStr));
-                  //widget.db = widget.applicationservice.load(dateStr);
                 });
                 // 가계부 리스트  업데이트 추가
               });
@@ -74,7 +81,8 @@ class _DailyAccountState extends State<DailyAccount> {
                 itemBuilder: (context, index) {
                   return Card(
                     elevation: 5,
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
                     child: ListTile(
                       title: Text(data[index].content),
                       subtitle: Text(data[index].category),
@@ -93,16 +101,61 @@ class _DailyAccountState extends State<DailyAccount> {
       )),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          categoryContentConroller = new TextEditingController();
+          contentConroller = TextEditingController();
+          amountConroller = TextEditingController();
           await showDialog(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('더하기'),
                   content: Column(children: <Widget>[
+                    const Text(
+                      '내용',
+                      style: TextStyle(color: Colors.blue),
+                    ),
                     TextField(
-                        controller: categoryContentConroller,
-                        keyboardType: TextInputType.text)
+                        controller: contentConroller,
+                        keyboardType: TextInputType.text),
+                    const Text(
+                      '날짜',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    Text(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                    MyDialog(
+                      onValueChange: _onValueChange,
+                      initialValue: _category,
+                    ),
+                    const Text(
+                      '금액',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    TextField(
+                        controller: amountConroller,
+                        keyboardType: TextInputType.text),
+                    /*
+                    PopupMenuButton(
+                      //onSelected: (value) => setState(() {
+                      //  _category = value as String;
+                      //}),
+                      onSelected: (value) => {_onValueChange(value as String)},
+                      itemBuilder: (_) => [
+                        new CheckedPopupMenuItem(
+                          checked: _category == Category.food,
+                          value: '식비',
+                          child: new Text('식비'),
+                        ),
+                        new CheckedPopupMenuItem(
+                          checked: _category == Category.cloth,
+                          value: '의복미용',
+                          child: new Text('의복미용'),
+                        ),
+                        new CheckedPopupMenuItem(
+                          checked: _category == Category.living,
+                          value: '생활용품',
+                          child: new Text('생활용품'),
+                        ),
+                      ],
+                    ),*/
                   ]),
                   actions: <Widget>[
                     TextButton(
@@ -113,13 +166,21 @@ class _DailyAccountState extends State<DailyAccount> {
                     ),
                     TextButton(
                       onPressed: () {
+                        print('try to save');
+                        print(contentConroller.value.text);
+                        print(amountConroller.value.text);
+                        print(_category);
+                        print(DateFormat('yyyyMM').format(selectedDate));
                         Account result = Account(
-                            category: '식비',
-                            ammount: 1500,
-                            date: '2022-09-02',
-                            content: '스타벅스');
-                        widget.applicationservice
-                            .then((value) => {value.save('202209', result)});
+                            category: _category,
+                            ammount: int.parse(amountConroller.value.text),
+                            date: DateFormat('yyyy-MM-dd').format(selectedDate),
+                            content: contentConroller.value.text);
+                        widget.applicationservice.then((value) => {
+                              value.save(
+                                  DateFormat('yyyyMM').format(selectedDate),
+                                  result)
+                            });
                         Future.delayed(const Duration(milliseconds: 1000), () {
                           setState(() {
                             final String dateStr =
@@ -138,6 +199,63 @@ class _DailyAccountState extends State<DailyAccount> {
         },
         child: const Icon(Icons.edit),
       ), // This trailing comma
+    );
+  }
+}
+
+class MyDialog extends StatefulWidget {
+  const MyDialog({required this.onValueChange, required this.initialValue});
+
+  final String initialValue;
+  final void Function(String) onValueChange;
+
+  @override
+  State createState() => MyDialogState();
+}
+
+class MyDialogState extends State<MyDialog> {
+  String _selectedId = '식비';
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedId = widget.initialValue;
+  }
+
+  Widget build(BuildContext context) {
+    return SimpleDialog(
+      title: const Text("카테고리 선택", style: TextStyle(color: Colors.blue)),
+      children: <Widget>[
+        new Container(
+            padding: const EdgeInsets.all(10.0),
+            child: DropdownButton<String>(
+              hint: const Text("Pick a thing"),
+              value: _selectedId,
+              onChanged: (value) {
+                setState(() {
+                  _selectedId = value as String;
+                });
+                widget.onValueChange(value as String);
+              },
+              items: <String>[
+                '식비',
+                '의복미용',
+                '생활용품',
+                '의료',
+                '기타',
+                '교통',
+                '여가활동',
+                '용돈',
+                '육아',
+                '꿈지출'
+              ].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            )),
+      ],
     );
   }
 }
