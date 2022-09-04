@@ -24,14 +24,10 @@ class AccountRepository implements IaccountRepository {
     };
     http.Response response = await http.post(uri, headers: headers);
     if (response.statusCode == 200) {
-      //print(json.decode(response.body)['results']);
       var ret = json
           .decode(response.body)['results']
           .map((e) => Account.fromJson(e))
           .toList();
-      if (ret.length != 0) {
-        print(ret[0].content);
-      }
       return ret;
     } else {
       throw Exception('can not get data from notion');
@@ -68,7 +64,6 @@ class AccountRepository implements IaccountRepository {
     });
     http.Response response = await http.post(uri, headers: headers, body: body);
     if (response.statusCode == 200) {
-      print('Save Success');
     } else {
       throw Exception('can not get data from notion');
     }

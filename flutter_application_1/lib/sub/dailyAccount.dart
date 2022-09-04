@@ -166,11 +166,6 @@ class _DailyAccountState extends State<DailyAccount> {
                     ),
                     TextButton(
                       onPressed: () {
-                        print('try to save');
-                        print(contentConroller.value.text);
-                        print(amountConroller.value.text);
-                        print(_category);
-                        print(DateFormat('yyyyMM').format(selectedDate));
                         Account result = Account(
                             category: _category,
                             ammount: int.parse(amountConroller.value.text),

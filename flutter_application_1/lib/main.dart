@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/object/account.dart';
 import './repository/account_repository.dart';
 import './object/AccountApplicationService.dart';
 import 'dart:convert';
@@ -45,14 +44,11 @@ class MyApp extends StatelessWidget {
   }
 
   Future<AccountApplicationService> initApplicationService() async {
-    print('Load database');
     String jsonString = await rootBundle.loadString('assets/json/env.json');
-    print(jsonString);
     final jsonResponse = json.decode(jsonString);
     String databaseString =
         await rootBundle.loadString('assets/json/database_info.json');
     final databaseInfo = json.decode(databaseString);
-    print(databaseInfo);
     var repo = AccountRepository(jsonResponse['NOTION_KEY'], '2022-02-22');
     return AccountApplicationService(repo, databaseInfo);
   }
