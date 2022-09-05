@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'repository/account_repository.dart';
+import 'package:flutter_application_1/sub/DailyAccount.dart';
+import './repository/account_repository.dart';
 import './object/AccountApplicationService.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
@@ -21,18 +22,20 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Account Book',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: '공이와 묭이의 가계부'),
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or simply save your changes to "hot reload" in a Flutter IDE).
+          // Notice that the counter didn't reset back to zero; the application
+          // is not restarted.
+          primarySwatch: Colors.blue),
+      home: MyHomePage(
+          title: '공이와 묭이의 가계부',
+          db: database,
+          applicationservice: accountApplicationService),
     );
   }
 }
@@ -60,8 +63,13 @@ class _MyHomePageState extends State<MyHomePage>
   late TabController controller;
   DateTime selectedDate = DateTime.now();
   late TextEditingController categoryContentConroller;
-  late Future<List> db;
-  late Future<AccountApplicationService> applicationservice;
+  int _selectedIndex = 0;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -85,14 +93,47 @@ class _MyHomePageState extends State<MyHomePage>
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      body: TabBarView(children: <Widget>[
-        DailyAccount(db: db, applicationservice: applicationservice),
-        WeeklyResult(db: db, applicationservice: applicationservice)
-      ], controller: controller),
-      bottomNavigationBar: TabBar(tabs: <Tab>[
-        Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24)),
-        Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
-      ], controller: controller),
+      body: Center(
+          child: IndexedStack(
+        index: _selectedIndex,
+        children: <Widget>[
+          DailyAccount(
+              db: widget.db, applicationservice: widget.applicationservice),
+          WeeklyResult(
+              db: widget.db, applicationservice: widget.applicationservice)
+        ],
+      )),
+      /* TabBarView(children: <Widget>[
+        DailyAccount(
+            db: widget.db, applicationservice: widget.applicationservice),
+        WeeklyResult(
+            db: widget.db, applicationservice: widget.applicationservice)
+      ], controller: controller),*/
+      /*bottomNavigationBar: TabBar(
+        tabs: <Tab>[
+          Tab(
+              icon:
+                  Image.asset('assets/icon/daily.png', width: 24, height: 24)),
+          Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
+        ],
+        controller: controller,
+        indicatorColor: const Color.fromRGBO(254, 110, 14, 1),
+      ),*/
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            label: 'Business',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.black,
+        onTap: _onItemTapped,
+      ),
     );
   }
 

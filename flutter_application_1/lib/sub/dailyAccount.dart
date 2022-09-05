@@ -36,7 +36,12 @@ class _DailyAccountState extends State<DailyAccount> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: const Text('공이와 묭이의 가계부'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '가계부',
+          style: TextStyle(color: Colors.black),
+        ),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -57,8 +62,8 @@ class _DailyAccountState extends State<DailyAccount> {
               });
             },
             child: Text(
-              DateFormat.yMMMEd().format(selectedDate),
-              style: const TextStyle(color: Colors.white),
+              DateFormat('yyyy-MM-dd').format(selectedDate),
+              style: const TextStyle(color: Colors.black),
             ),
           )
         ],
@@ -78,6 +83,7 @@ class _DailyAccountState extends State<DailyAccount> {
               });
               data = data.reversed.toList();
               int length = data.length;
+              var f = NumberFormat('###,###,###,###');
               return ListView.builder(
                 itemBuilder: (context, index) {
                   return Card(
@@ -88,7 +94,8 @@ class _DailyAccountState extends State<DailyAccount> {
                       title: Text(data[index].content),
                       subtitle: Text(data[index].category),
                       leading: Text(data[index].date),
-                      trailing: Text(data[index].ammount.toString() + '원'),
+                      trailing:
+                          Text(f.format(data[index].ammount).toString() + '원'),
                     ),
                   );
                 },
@@ -101,6 +108,7 @@ class _DailyAccountState extends State<DailyAccount> {
         ),
       )),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color.fromRGBO(254, 110, 14, 1),
         onPressed: () async {
           contentConroller = TextEditingController();
           amountConroller = TextEditingController();
@@ -108,88 +116,45 @@ class _DailyAccountState extends State<DailyAccount> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text('더하기'),
-                  content: Column(children: <Widget>[
-                    const Text(
-                      '내용',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    TextField(
-                        controller: contentConroller,
-                        keyboardType: TextInputType.text),
-                    const Text(
-                      '날짜',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    Text(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                  title: const Text('내역 추가'),
+                  content:
+                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
+                    //const SizedBox(
+                    //  height: 20,
+                    //),
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                            DateFormat('yyyy-MM-dd').format(selectedDate))),
+                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
                     MyDialog(
                       onValueChange: _onValueChange,
                       initialValue: _category,
                     ),
-                    /*DropdownButton<String>(
-                      hint: const Text("Pick a thing"),
-                      value: _category,
-                      onChanged: (value) {
-                        setState(() {
-                          _category = value as String;
-                        });
-                      },
-                      items: <String>[
-                        '식비',
-                        '의복미용',
-                        '생활용품',
-                        '의료',
-                        '기타',
-                        '교통',
-                        '여가활동',
-                        '용돈',
-                        '육아',
-                        '꿈지출'
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),*/
-                    const Text(
-                      '금액',
-                      style: TextStyle(color: Colors.blue),
-                    ),
+                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
                     TextField(
-                        controller: amountConroller,
-                        keyboardType: TextInputType.text),
-                    /*
-                    PopupMenuButton(
-                      //onSelected: (value) => setState(() {
-                      //  _category = value as String;
-                      //}),
-                      onSelected: (value) => {_onValueChange(value as String)},
-                      itemBuilder: (_) => [
-                        new CheckedPopupMenuItem(
-                          checked: _category == Category.food,
-                          value: '식비',
-                          child: new Text('식비'),
-                        ),
-                        new CheckedPopupMenuItem(
-                          checked: _category == Category.cloth,
-                          value: '의복미용',
-                          child: new Text('의복미용'),
-                        ),
-                        new CheckedPopupMenuItem(
-                          checked: _category == Category.living,
-                          value: '생활용품',
-                          child: new Text('생활용품'),
-                        ),
-                      ],
-                    ),*/
+                        controller: contentConroller,
+                        keyboardType: TextInputType.text,
+                        decoration: const InputDecoration(
+                            hintText: '내용', border: InputBorder.none)),
+                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
+                    TextField(
+                      controller: amountConroller,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                          hintText: '금액', border: InputBorder.none),
+                    ),
                   ]),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text('취소'),
+                      child: const Text(
+                        '취소',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
@@ -213,13 +178,20 @@ class _DailyAccountState extends State<DailyAccount> {
                           Navigator.of(context).pop();
                         });
                       },
-                      child: const Text('저장'),
+                      child: const Text(
+                        '저장',
+                        style:
+                            TextStyle(color: Color.fromRGBO(217, 134, 74, 1)),
+                      ),
                     ),
                   ],
                 );
               });
         },
-        child: const Icon(Icons.edit),
+        child: const Icon(
+          Icons.edit,
+          //color: Color.fromRGBO(254, 110, 14, 1),
+        ),
       ), // This trailing comma
     );
   }
@@ -247,6 +219,7 @@ class MyDialogState extends State<MyDialog> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
+      isExpanded: true,
       hint: const Text("Pick a thing"),
       value: _selectedId,
       onChanged: (value) {
