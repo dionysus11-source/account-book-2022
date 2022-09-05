@@ -62,7 +62,7 @@ class _DailyAccountState extends State<DailyAccount> {
               });
             },
             child: Text(
-              DateFormat.yMMMEd().format(selectedDate),
+              DateFormat('yyyy-MM-dd').format(selectedDate),
               style: const TextStyle(color: Colors.black),
             ),
           )
