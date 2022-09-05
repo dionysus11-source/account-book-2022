@@ -16,11 +16,12 @@ class _DailyAccountState extends State<DailyAccount> {
   late TextEditingController contentConroller;
   late TextEditingController amountConroller;
   DateTime selectedDate = DateTime.now();
-  String _category = '식비';
+  late String _category;
 
   @override
   void initState() {
     super.initState();
+    _category = '식비';
   }
 
   void _onValueChange(String value) {
@@ -125,6 +126,32 @@ class _DailyAccountState extends State<DailyAccount> {
                       onValueChange: _onValueChange,
                       initialValue: _category,
                     ),
+                    /*DropdownButton<String>(
+                      hint: const Text("Pick a thing"),
+                      value: _category,
+                      onChanged: (value) {
+                        setState(() {
+                          _category = value as String;
+                        });
+                      },
+                      items: <String>[
+                        '식비',
+                        '의복미용',
+                        '생활용품',
+                        '의료',
+                        '기타',
+                        '교통',
+                        '여가활동',
+                        '용돈',
+                        '육아',
+                        '꿈지출'
+                      ].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),*/
                     const Text(
                       '금액',
                       style: TextStyle(color: Colors.blue),
@@ -217,40 +244,34 @@ class MyDialogState extends State<MyDialog> {
     _selectedId = widget.initialValue;
   }
 
+  @override
   Widget build(BuildContext context) {
-    return SimpleDialog(
-      title: const Text("카테고리 선택", style: TextStyle(color: Colors.blue)),
-      children: <Widget>[
-        new Container(
-            padding: const EdgeInsets.all(10.0),
-            child: DropdownButton<String>(
-              hint: const Text("Pick a thing"),
-              value: _selectedId,
-              onChanged: (value) {
-                setState(() {
-                  _selectedId = value as String;
-                });
-                widget.onValueChange(value as String);
-              },
-              items: <String>[
-                '식비',
-                '의복미용',
-                '생활용품',
-                '의료',
-                '기타',
-                '교통',
-                '여가활동',
-                '용돈',
-                '육아',
-                '꿈지출'
-              ].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            )),
-      ],
+    return DropdownButton<String>(
+      hint: const Text("Pick a thing"),
+      value: _selectedId,
+      onChanged: (value) {
+        setState(() {
+          _selectedId = value as String;
+        });
+        widget.onValueChange(value as String);
+      },
+      items: <String>[
+        '식비',
+        '의복미용',
+        '생활용품',
+        '의료',
+        '기타',
+        '교통',
+        '여가활동',
+        '용돈',
+        '육아',
+        '꿈지출'
+      ].map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import './repository/account_repository.dart';
+import 'repository/account_repository.dart';
 import './object/AccountApplicationService.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
@@ -18,10 +18,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Future<AccountApplicationService> accountApplicationService =
-        initApplicationService();
-    Future<List> database =
-        accountApplicationService.then((aas) => initDatabase(aas));
     return MaterialApp(
       title: 'Account Book',
       theme: ThemeData(
@@ -36,38 +32,13 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(
-          title: '공이와 묭이의 가계부',
-          db: database,
-          applicationservice: accountApplicationService),
+      home: const MyHomePage(title: '공이와 묭이의 가계부'),
     );
-  }
-
-  Future<AccountApplicationService> initApplicationService() async {
-    String jsonString = await rootBundle.loadString('assets/json/env.json');
-    final jsonResponse = json.decode(jsonString);
-    String databaseString =
-        await rootBundle.loadString('assets/json/database_info.json');
-    final databaseInfo = json.decode(databaseString);
-    var repo = AccountRepository(jsonResponse['NOTION_KEY'], '2022-02-22');
-    return AccountApplicationService(repo, databaseInfo);
-  }
-
-  Future<List> initDatabase(AccountApplicationService acs) async {
-    final String dateStr = DateFormat('yyyyMM').format(DateTime.now());
-    return acs.load(dateStr);
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  Future<List> db;
-  Future<AccountApplicationService> applicationservice;
-  MyHomePage(
-      {Key? key,
-      required this.title,
-      required this.db,
-      required this.applicationservice})
-      : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -79,9 +50,7 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
-  void refesh(String date) {
-    //db = applicationservice.load()
-  }
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -91,10 +60,14 @@ class _MyHomePageState extends State<MyHomePage>
   late TabController controller;
   DateTime selectedDate = DateTime.now();
   late TextEditingController categoryContentConroller;
+  late Future<List> db;
+  late Future<AccountApplicationService> applicationservice;
   @override
   void initState() {
     super.initState();
     controller = TabController(length: 2, vsync: this);
+    applicationservice = initApplicationService();
+    db = applicationservice.then((aas) => initDatabase(aas));
   }
 
   @override
@@ -113,15 +86,28 @@ class _MyHomePageState extends State<MyHomePage>
     // than having to individually change instances of widgets.
     return Scaffold(
       body: TabBarView(children: <Widget>[
-        DailyAccount(
-            db: widget.db, applicationservice: widget.applicationservice),
-        WeeklyResult(
-            db: widget.db, applicationservice: widget.applicationservice)
+        DailyAccount(db: db, applicationservice: applicationservice),
+        WeeklyResult(db: db, applicationservice: applicationservice)
       ], controller: controller),
       bottomNavigationBar: TabBar(tabs: <Tab>[
         Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24)),
         Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
       ], controller: controller),
     );
+  }
+
+  Future<AccountApplicationService> initApplicationService() async {
+    String jsonString = await rootBundle.loadString('assets/json/env.json');
+    final jsonResponse = json.decode(jsonString);
+    String databaseString =
+        await rootBundle.loadString('assets/json/database_info.json');
+    final databaseInfo = json.decode(databaseString);
+    var repo = AccountRepository(jsonResponse['NOTION_KEY'], '2022-02-22');
+    return AccountApplicationService(repo, databaseInfo);
+  }
+
+  Future<List> initDatabase(AccountApplicationService acs) async {
+    final String dateStr = DateFormat('yyyyMM').format(DateTime.now());
+    return acs.load(dateStr);
   }
 }

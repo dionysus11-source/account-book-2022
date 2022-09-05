@@ -33,7 +33,8 @@ class _WeeklyResultState extends State<WeeklyResult> {
                 itemBuilder: (context, index) {
                   return Card(
                     elevation: 5,
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
                     child:
                         ListTile(title: Text(title), subtitle: Text(content)),
                   );
@@ -41,7 +42,7 @@ class _WeeklyResultState extends State<WeeklyResult> {
                 itemCount: title.length,
               );
             }
-            return Text('No data');
+            return const Text('No data');
           },
           future: widget.db,
         ),
