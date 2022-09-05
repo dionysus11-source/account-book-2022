@@ -14,4 +14,12 @@ class AccountApplicationService {
     String databaseId = databaseInfo[date];
     accountRepository.save(databaseId, data);
   }
+
+  void deleteItem(String date, Account data) {
+    String databaseId = databaseInfo[date];
+    Future<String> blockId = accountRepository.query(databaseId, data);
+    blockId.then((value) {
+      accountRepository.deleteBlock(value);
+    });
+  }
 }

@@ -85,6 +85,7 @@ class _DailyAccountState extends State<DailyAccount> {
               int length = data.length;
               var f = NumberFormat('###,###,###,###');
               return ListView.builder(
+                controller: ScrollController(),
                 itemBuilder: (context, index) {
                   return Card(
                     elevation: 5,
@@ -167,6 +168,9 @@ class _DailyAccountState extends State<DailyAccount> {
                               value.save(
                                   DateFormat('yyyyMM').format(selectedDate),
                                   result)
+                              //value.deleteItem(
+                              //    DateFormat('yyyyMM').format(selectedDate),
+                              //    result)
                             });
                         Future.delayed(const Duration(milliseconds: 1000), () {
                           setState(() {

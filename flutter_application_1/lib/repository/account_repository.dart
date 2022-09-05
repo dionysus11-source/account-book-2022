@@ -5,6 +5,8 @@ import '../object/account.dart';
 abstract class IaccountRepository {
   void load(String databaseId);
   void save(String databaseId, Account data);
+  Future<String> query(String databaseId, Account data);
+  void deleteBlock(String blockId);
 }
 
 class AccountRepository implements IaccountRepository {
@@ -65,6 +67,58 @@ class AccountRepository implements IaccountRepository {
     http.Response response = await http.post(uri, headers: headers, body: body);
     if (response.statusCode == 200) {
     } else {
+      throw Exception('can not get data from notion');
+    }
+  }
+
+  @override
+  Future<String> query(String databaseId, Account data) async {
+    String url = 'https://api.notion.com/v1/databases/' + databaseId + '/query';
+    final uri = Uri.parse(url);
+    Map<String, String> headers = {
+      "Authorization": "Bearer " + notionKey,
+      "Content-Type": "application/json",
+      "Notion-Version": notionVersion
+    };
+    final body = jsonEncode({
+      "filter": {
+        "and": [
+          {
+            "property": "내용",
+            "rich_text": {"equals": data.content}
+          },
+          {
+            "property": "금액",
+            "number": {"equals": data.ammount}
+          },
+          {
+            "property": "결제일",
+            "date": {"equals": data.date}
+          }
+        ]
+      }
+    });
+    http.Response response = await http.post(uri, headers: headers, body: body);
+    if (response.statusCode == 200) {
+      var ret = json.decode(response.body)['results'][0]['id'];
+      print(ret);
+      return ret;
+    } else {
+      throw Exception('can not get data from notion');
+    }
+  }
+
+  @override
+  void deleteBlock(String blockId) async {
+    String url = 'https://api.notion.com/v1/blocks/' + blockId;
+    final uri = Uri.parse(url);
+    Map<String, String> headers = {
+      "Authorization": "Bearer " + notionKey,
+      "Content-Type": "application/json",
+      "Notion-Version": notionVersion
+    };
+    http.Response response = await http.delete(uri, headers: headers);
+    if (response.statusCode != 200) {
       throw Exception('can not get data from notion');
     }
   }
