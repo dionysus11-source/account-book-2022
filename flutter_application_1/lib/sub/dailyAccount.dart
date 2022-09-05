@@ -16,11 +16,12 @@ class _DailyAccountState extends State<DailyAccount> {
   late TextEditingController contentConroller;
   late TextEditingController amountConroller;
   DateTime selectedDate = DateTime.now();
-  String _category = '식비';
+  late String _category;
 
   @override
   void initState() {
     super.initState();
+    _category = '식비';
   }
 
   void _onValueChange(String value) {
@@ -107,55 +108,35 @@ class _DailyAccountState extends State<DailyAccount> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text('더하기'),
+                  title: const Text('내역 추가'),
                   content: Column(children: <Widget>[
-                    const Text(
-                      '내용',
-                      style: TextStyle(color: Colors.blue),
-                    ),
                     TextField(
                         controller: contentConroller,
-                        keyboardType: TextInputType.text),
+                        keyboardType: TextInputType.text,
+                        decoration: const InputDecoration(hintText: '내용')),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     const Text(
                       '날짜',
                       style: TextStyle(color: Colors.blue),
                     ),
                     Text(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     MyDialog(
                       onValueChange: _onValueChange,
                       initialValue: _category,
                     ),
-                    const Text(
-                      '금액',
-                      style: TextStyle(color: Colors.blue),
+                    const SizedBox(
+                      height: 20,
                     ),
                     TextField(
-                        controller: amountConroller,
-                        keyboardType: TextInputType.text),
-                    /*
-                    PopupMenuButton(
-                      //onSelected: (value) => setState(() {
-                      //  _category = value as String;
-                      //}),
-                      onSelected: (value) => {_onValueChange(value as String)},
-                      itemBuilder: (_) => [
-                        new CheckedPopupMenuItem(
-                          checked: _category == Category.food,
-                          value: '식비',
-                          child: new Text('식비'),
-                        ),
-                        new CheckedPopupMenuItem(
-                          checked: _category == Category.cloth,
-                          value: '의복미용',
-                          child: new Text('의복미용'),
-                        ),
-                        new CheckedPopupMenuItem(
-                          checked: _category == Category.living,
-                          value: '생활용품',
-                          child: new Text('생활용품'),
-                        ),
-                      ],
-                    ),*/
+                      controller: amountConroller,
+                      keyboardType: TextInputType.text,
+                      decoration: const InputDecoration(hintText: '금액'),
+                    ),
                   ]),
                   actions: <Widget>[
                     TextButton(
@@ -217,40 +198,34 @@ class MyDialogState extends State<MyDialog> {
     _selectedId = widget.initialValue;
   }
 
+  @override
   Widget build(BuildContext context) {
-    return SimpleDialog(
-      title: const Text("카테고리 선택", style: TextStyle(color: Colors.blue)),
-      children: <Widget>[
-        new Container(
-            padding: const EdgeInsets.all(10.0),
-            child: DropdownButton<String>(
-              hint: const Text("Pick a thing"),
-              value: _selectedId,
-              onChanged: (value) {
-                setState(() {
-                  _selectedId = value as String;
-                });
-                widget.onValueChange(value as String);
-              },
-              items: <String>[
-                '식비',
-                '의복미용',
-                '생활용품',
-                '의료',
-                '기타',
-                '교통',
-                '여가활동',
-                '용돈',
-                '육아',
-                '꿈지출'
-              ].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            )),
-      ],
+    return DropdownButton<String>(
+      hint: const Text("Pick a thing"),
+      value: _selectedId,
+      onChanged: (value) {
+        setState(() {
+          _selectedId = value as String;
+        });
+        widget.onValueChange(value as String);
+      },
+      items: <String>[
+        '식비',
+        '의복미용',
+        '생활용품',
+        '의료',
+        '기타',
+        '교통',
+        '여가활동',
+        '용돈',
+        '육아',
+        '꿈지출'
+      ].map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
     );
   }
 }
