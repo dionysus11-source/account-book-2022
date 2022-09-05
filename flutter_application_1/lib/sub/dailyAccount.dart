@@ -17,6 +17,13 @@ class _DailyAccountState extends State<DailyAccount> {
   late TextEditingController amountConroller;
   DateTime selectedDate = DateTime.now();
   late String _category;
+  List<String> choices = <String>['Item 1', 'Item 2', 'Item 3'];
+  String _selectedChoices = 'Item 1';
+  void _select(String choice) {
+    setState(() {
+      _selectedChoices = choice;
+    });
+  }
 
   @override
   void initState() {
@@ -95,8 +102,38 @@ class _DailyAccountState extends State<DailyAccount> {
                       title: Text(data[index].content),
                       subtitle: Text(data[index].category),
                       leading: Text(data[index].date),
-                      trailing:
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
                           Text(f.format(data[index].ammount).toString() + '원'),
+                          PopupMenuButton(
+                            onSelected: _select,
+                            padding: EdgeInsets.zero,
+                            itemBuilder: (BuildContext context) {
+                              return choices.map((String choice) {
+                                return PopupMenuItem<String>(
+                                  value: choice,
+                                  child: Text(choice),
+                                );
+                              }).toList();
+                            },
+                          )
+                        ],
+                      ),
+
+                      //Text(f.format(data[index].ammount).toString() + '원'),
+                      /*PopupMenuButton(
+                          onSelected: _select,
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (BuildContext context) {
+                            return choices.map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Text(choice),
+                              );
+                            }).toList();
+                          },
+                        )*/
                     ),
                   );
                 },
