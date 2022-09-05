@@ -111,7 +111,8 @@ class _DailyAccountState extends State<DailyAccount> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('내역 추가'),
-                  content: Column(children: <Widget>[
+                  content:
+                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                     TextField(
                         controller: contentConroller,
                         keyboardType: TextInputType.text,
@@ -136,7 +137,7 @@ class _DailyAccountState extends State<DailyAccount> {
                     ),
                     TextField(
                       controller: amountConroller,
-                      keyboardType: TextInputType.text,
+                      keyboardType: TextInputType.number,
                       decoration: const InputDecoration(hintText: '금액'),
                     ),
                   ]),
