@@ -78,6 +78,7 @@ class _DailyAccountState extends State<DailyAccount> {
               });
               data = data.reversed.toList();
               int length = data.length;
+              var f = NumberFormat('###,###,###,###');
               return ListView.builder(
                 itemBuilder: (context, index) {
                   return Card(
@@ -88,7 +89,8 @@ class _DailyAccountState extends State<DailyAccount> {
                       title: Text(data[index].content),
                       subtitle: Text(data[index].category),
                       leading: Text(data[index].date),
-                      trailing: Text(data[index].ammount.toString() + '원'),
+                      trailing:
+                          Text(f.format(data[index].ammount).toString() + '원'),
                     ),
                   );
                 },
