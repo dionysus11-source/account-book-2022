@@ -32,10 +32,7 @@ class MyApp extends StatelessWidget {
           // Notice that the counter didn't reset back to zero; the application
           // is not restarted.
           primarySwatch: Colors.blue),
-      home: MyHomePage(
-          title: '공이와 묭이의 가계부',
-          db: database,
-          applicationservice: accountApplicationService),
+      home: const MyHomePage(title: '공이와 묭이의 가계부'),
     );
   }
 }
@@ -64,6 +61,8 @@ class _MyHomePageState extends State<MyHomePage>
   DateTime selectedDate = DateTime.now();
   late TextEditingController categoryContentConroller;
   int _selectedIndex = 0;
+  late Future<AccountApplicationService> applicationservice;
+  late Future<List> db;
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -97,10 +96,8 @@ class _MyHomePageState extends State<MyHomePage>
           child: IndexedStack(
         index: _selectedIndex,
         children: <Widget>[
-          DailyAccount(
-              db: widget.db, applicationservice: widget.applicationservice),
-          WeeklyResult(
-              db: widget.db, applicationservice: widget.applicationservice)
+          DailyAccount(db: db, applicationservice: applicationservice),
+          WeeklyResult(db: db, applicationservice: applicationservice)
         ],
       )),
       /* TabBarView(children: <Widget>[
