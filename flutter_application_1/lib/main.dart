@@ -19,10 +19,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Future<AccountApplicationService> accountApplicationService =
-        initApplicationService();
-    Future<List> database =
-        accountApplicationService.then((aas) => initDatabase(aas));
     return MaterialApp(
       title: 'Account Book',
       theme: ThemeData(
@@ -42,32 +38,10 @@ class MyApp extends StatelessWidget {
           applicationservice: accountApplicationService),
     );
   }
-
-  Future<AccountApplicationService> initApplicationService() async {
-    String jsonString = await rootBundle.loadString('assets/json/env.json');
-    final jsonResponse = json.decode(jsonString);
-    String databaseString =
-        await rootBundle.loadString('assets/json/database_info.json');
-    final databaseInfo = json.decode(databaseString);
-    var repo = AccountRepository(jsonResponse['NOTION_KEY'], '2022-02-22');
-    return AccountApplicationService(repo, databaseInfo);
-  }
-
-  Future<List> initDatabase(AccountApplicationService acs) async {
-    final String dateStr = DateFormat('yyyyMM').format(DateTime.now());
-    return acs.load(dateStr);
-  }
 }
 
 class MyHomePage extends StatefulWidget {
-  Future<List> db;
-  Future<AccountApplicationService> applicationservice;
-  MyHomePage(
-      {Key? key,
-      required this.title,
-      required this.db,
-      required this.applicationservice})
-      : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -79,9 +53,7 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
-  void refesh(String date) {
-    //db = applicationservice.load()
-  }
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -102,6 +74,8 @@ class _MyHomePageState extends State<MyHomePage>
   void initState() {
     super.initState();
     controller = TabController(length: 2, vsync: this);
+    applicationservice = initApplicationService();
+    db = applicationservice.then((aas) => initDatabase(aas));
   }
 
   @override
@@ -161,5 +135,20 @@ class _MyHomePageState extends State<MyHomePage>
         onTap: _onItemTapped,
       ),
     );
+  }
+
+  Future<AccountApplicationService> initApplicationService() async {
+    String jsonString = await rootBundle.loadString('assets/json/env.json');
+    final jsonResponse = json.decode(jsonString);
+    String databaseString =
+        await rootBundle.loadString('assets/json/database_info.json');
+    final databaseInfo = json.decode(databaseString);
+    var repo = AccountRepository(jsonResponse['NOTION_KEY'], '2022-02-22');
+    return AccountApplicationService(repo, databaseInfo);
+  }
+
+  Future<List> initDatabase(AccountApplicationService acs) async {
+    final String dateStr = DateFormat('yyyyMM').format(DateTime.now());
+    return acs.load(dateStr);
   }
 }

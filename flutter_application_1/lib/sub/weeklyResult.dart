@@ -56,7 +56,7 @@ class _WeeklyResultState extends State<WeeklyResult> {
                 itemCount: length,
               );
             }
-            return Text('No data');
+            return const Text('No data');
           },
           future: widget.db,
         ),
