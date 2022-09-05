@@ -36,7 +36,12 @@ class _DailyAccountState extends State<DailyAccount> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: const Text('공이와 묭이의 가계부'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '가계부',
+          style: TextStyle(color: Colors.black),
+        ),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -58,7 +63,7 @@ class _DailyAccountState extends State<DailyAccount> {
             },
             child: Text(
               DateFormat.yMMMEd().format(selectedDate),
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.black),
             ),
           )
         ],
@@ -103,6 +108,7 @@ class _DailyAccountState extends State<DailyAccount> {
         ),
       )),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color.fromRGBO(254, 110, 14, 1),
         onPressed: () async {
           contentConroller = TextEditingController();
           amountConroller = TextEditingController();
@@ -113,32 +119,31 @@ class _DailyAccountState extends State<DailyAccount> {
                   title: const Text('내역 추가'),
                   content:
                       Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    TextField(
-                        controller: contentConroller,
-                        keyboardType: TextInputType.text,
-                        decoration: const InputDecoration(hintText: '내용')),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    const Text(
-                      '날짜',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    Text(DateFormat('yyyy-MM-dd').format(selectedDate)),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
+                    //const SizedBox(
+                    //  height: 20,
+                    //),
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                            DateFormat('yyyy-MM-dd').format(selectedDate))),
+                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
                     MyDialog(
                       onValueChange: _onValueChange,
                       initialValue: _category,
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
+                    TextField(
+                        controller: contentConroller,
+                        keyboardType: TextInputType.text,
+                        decoration: const InputDecoration(
+                            hintText: '내용', border: InputBorder.none)),
+                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
                     TextField(
                       controller: amountConroller,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(hintText: '금액'),
+                      decoration: const InputDecoration(
+                          hintText: '금액', border: InputBorder.none),
                     ),
                   ]),
                   actions: <Widget>[
@@ -146,7 +151,10 @@ class _DailyAccountState extends State<DailyAccount> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text('취소'),
+                      child: const Text(
+                        '취소',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
@@ -170,13 +178,20 @@ class _DailyAccountState extends State<DailyAccount> {
                           Navigator.of(context).pop();
                         });
                       },
-                      child: const Text('저장'),
+                      child: const Text(
+                        '저장',
+                        style:
+                            TextStyle(color: Color.fromRGBO(217, 134, 74, 1)),
+                      ),
                     ),
                   ],
                 );
               });
         },
-        child: const Icon(Icons.edit),
+        child: const Icon(
+          Icons.edit,
+          //color: Color.fromRGBO(254, 110, 14, 1),
+        ),
       ), // This trailing comma
     );
   }
@@ -204,6 +219,7 @@ class MyDialogState extends State<MyDialog> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
+      isExpanded: true,
       hint: const Text("Pick a thing"),
       value: _selectedId,
       onChanged: (value) {
