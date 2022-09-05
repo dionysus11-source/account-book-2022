@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../object/AccountApplicationService.dart';
 import '../object/account.dart';
+import 'package:intl/intl.dart';
 
 class WeeklyResult extends StatefulWidget {
   final Future<List> db;
@@ -26,19 +27,33 @@ class _WeeklyResultState extends State<WeeklyResult> {
         child: FutureBuilder(
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              Account data = snapshot.data as Account;
-              String title = data.category;
-              String content = 'test';
+              List<dynamic> data = snapshot.data as List<dynamic>;
+
+              data.sort((a, b) {
+                return a.date
+                    .toString()
+                    .toLowerCase()
+                    .compareTo(b.date.toString().toLowerCase());
+              });
+              data = data.reversed.toList();
+              int length = data.length;
+              var f = NumberFormat('###,###,###,###');
               return ListView.builder(
                 itemBuilder: (context, index) {
                   return Card(
                     elevation: 5,
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    child:
-                        ListTile(title: Text(title), subtitle: Text(content)),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    child: ListTile(
+                      title: Text(data[index].content),
+                      subtitle: Text(data[index].category),
+                      leading: Text(data[index].date),
+                      trailing:
+                          Text(f.format(data[index].ammount).toString() + '원'),
+                    ),
                   );
                 },
-                itemCount: title.length,
+                itemCount: length,
               );
             }
             return Text('No data');

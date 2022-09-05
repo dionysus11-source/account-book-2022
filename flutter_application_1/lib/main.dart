@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/sub/DailyAccount.dart';
 import './repository/account_repository.dart';
 import './object/AccountApplicationService.dart';
 import 'dart:convert';
@@ -90,6 +91,13 @@ class _MyHomePageState extends State<MyHomePage>
   late TabController controller;
   DateTime selectedDate = DateTime.now();
   late TextEditingController categoryContentConroller;
+  int _selectedIndex = 0;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -111,16 +119,47 @@ class _MyHomePageState extends State<MyHomePage>
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      body: TabBarView(children: <Widget>[
+      body: Center(
+          child: IndexedStack(
+        index: _selectedIndex,
+        children: <Widget>[
+          DailyAccount(
+              db: widget.db, applicationservice: widget.applicationservice),
+          WeeklyResult(
+              db: widget.db, applicationservice: widget.applicationservice)
+        ],
+      )),
+      /* TabBarView(children: <Widget>[
         DailyAccount(
             db: widget.db, applicationservice: widget.applicationservice),
         WeeklyResult(
             db: widget.db, applicationservice: widget.applicationservice)
-      ], controller: controller),
-      bottomNavigationBar: TabBar(tabs: <Tab>[
-        Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24)),
-        Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
-      ], controller: controller),
+      ], controller: controller),*/
+      /*bottomNavigationBar: TabBar(
+        tabs: <Tab>[
+          Tab(
+              icon:
+                  Image.asset('assets/icon/daily.png', width: 24, height: 24)),
+          Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
+        ],
+        controller: controller,
+        indicatorColor: const Color.fromRGBO(254, 110, 14, 1),
+      ),*/
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            label: 'Business',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.black,
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
