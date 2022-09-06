@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../object/AccountApplicationService.dart';
 import '../object/account.dart';
 import 'package:intl/intl.dart';
+import './edit_alert.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class DailyAccount extends StatefulWidget {
   Future<List> db;
@@ -19,8 +21,6 @@ class _DailyAccountState extends State<DailyAccount> {
   late String _category;
   List<String> choices = <String>['내역 수정', '삭제'];
   void _select(String choice, Account data) async {
-    print(choice);
-    print(data.date);
     if (choice == '삭제') {
       widget.applicationservice.then((value) {
         String date = data.date[0] +
@@ -29,13 +29,25 @@ class _DailyAccountState extends State<DailyAccount> {
             data.date[3] +
             data.date[5] +
             data.date[6];
-        value.deleteItem(date, data);
-        refreshAccount();
+        value.deleteItem(data);
+        _refreshAccount();
       });
+    } else if (choice == '내역 수정') {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return EditAlert(
+                title: '내역 수정',
+                selectedDate: selectedDate,
+                updateAccount: _refreshAccount,
+                db: widget.db,
+                applicationservice: widget.applicationservice,
+                account: data);
+          });
     }
   }
 
-  void refreshAccount() {
+  void _refreshAccount() {
     Future.delayed(const Duration(milliseconds: 1000), () {
       setState(() {
         widget.db = widget.applicationservice.then(
@@ -178,9 +190,6 @@ class _DailyAccountState extends State<DailyAccount> {
                   content:
                       Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                     const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
-                    //const SizedBox(
-                    //  height: 20,
-                    //),
                     Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -222,9 +231,7 @@ class _DailyAccountState extends State<DailyAccount> {
                             date: DateFormat('yyyy-MM-dd').format(selectedDate),
                             content: contentConroller.value.text);
                         widget.applicationservice.then((value) => {
-                              value.save(
-                                  DateFormat('yyyyMM').format(selectedDate),
-                                  result)
+                              value.save(result)
                               //value.deleteItem(
                               //    DateFormat('yyyyMM').format(selectedDate),
                               //    result)
