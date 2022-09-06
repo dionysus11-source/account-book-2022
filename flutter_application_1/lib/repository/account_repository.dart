@@ -7,6 +7,7 @@ abstract class IaccountRepository {
   void save(String databaseId, Account data);
   Future<String> query(String databaseId, Account data);
   void deleteBlock(String blockId);
+  void updateBlock(String blockId, Account data);
 }
 
 class AccountRepository implements IaccountRepository {
@@ -101,7 +102,6 @@ class AccountRepository implements IaccountRepository {
     http.Response response = await http.post(uri, headers: headers, body: body);
     if (response.statusCode == 200) {
       var ret = json.decode(response.body)['results'][0]['id'];
-      print(ret);
       return ret;
     } else {
       throw Exception('can not get data from notion');
@@ -118,6 +118,41 @@ class AccountRepository implements IaccountRepository {
       "Notion-Version": notionVersion
     };
     http.Response response = await http.delete(uri, headers: headers);
+    if (response.statusCode != 200) {
+      throw Exception('can not get data from notion');
+    }
+  }
+
+  @override
+  void updateBlock(String blockId, Account data) async {
+    String url = 'https://api.notion.com/v1/blocks/' + blockId;
+    url = 'https://api.notion.com/v1/pages/' + blockId;
+    final uri = Uri.parse(url);
+    Map<String, String> headers = {
+      "Authorization": "Bearer " + notionKey,
+      "Content-Type": "application/json",
+      "Notion-Version": notionVersion
+    };
+    final body = jsonEncode({
+      'properties': {
+        "내용": {
+          "title": [
+            {
+              "text": {"content": data.content}
+            }
+          ]
+        },
+        "분류": {
+          'select': {'name': data.category}
+        },
+        '금액': {'number': data.ammount},
+        '결제일': {
+          'date': {'start': data.date}
+        }
+      }
+    });
+    http.Response response =
+        await http.patch(uri, headers: headers, body: body);
     if (response.statusCode != 200) {
       throw Exception('can not get data from notion');
     }
