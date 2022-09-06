@@ -3,7 +3,6 @@ import '../object/AccountApplicationService.dart';
 import '../object/account.dart';
 import 'package:intl/intl.dart';
 import './edit_alert.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class DailyAccount extends StatefulWidget {
   Future<List> db;

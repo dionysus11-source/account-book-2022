@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../object/account.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 
 abstract class IaccountRepository {
   void load(String databaseId);
@@ -67,6 +70,16 @@ class AccountRepository implements IaccountRepository {
     });
     http.Response response = await http.post(uri, headers: headers, body: body);
     if (response.statusCode == 200) {
+      if (Platform.isAndroid) {
+        Fluttertoast.showToast(
+            msg: "Saved",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: const Color.fromRGBO(217, 134, 74, 1),
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     } else {
       throw Exception('can not get data from notion');
     }
