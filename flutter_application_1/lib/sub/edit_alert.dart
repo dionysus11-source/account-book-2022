@@ -71,19 +71,13 @@ class EditAlertState extends State<EditAlert> {
           ),
         ),
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             Account result = Account(
                 category: _category,
                 ammount: int.parse(amountConroller.value.text),
                 date: widget.account.date,
                 content: contentConroller.value.text);
-            final String dateStr = widget.account.date[0] +
-                widget.account.date[1] +
-                widget.account.date[2] +
-                widget.account.date[3] +
-                widget.account.date[5] +
-                widget.account.date[6];
-            widget.applicationservice
+            await widget.applicationservice
                 .then((value) => {value.editItem(widget.account, result)});
             widget.updateAccount();
             //Future.delayed(const Duration(milliseconds: 1000), () {
