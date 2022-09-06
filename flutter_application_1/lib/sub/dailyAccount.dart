@@ -21,7 +21,7 @@ class _DailyAccountState extends State<DailyAccount> {
   List<String> choices = <String>['내역 수정', '삭제'];
   void _select(String choice, Account data) async {
     if (choice == '삭제') {
-      widget.applicationservice.then((value) {
+      await widget.applicationservice.then((value) {
         String date = data.date[0] +
             data.date[1] +
             data.date[2] +
@@ -29,8 +29,8 @@ class _DailyAccountState extends State<DailyAccount> {
             data.date[5] +
             data.date[6];
         value.deleteItem(data);
-        _refreshAccount();
       });
+      _refreshAccount();
     } else if (choice == '내역 수정') {
       showDialog(
           context: context,
@@ -223,27 +223,16 @@ class _DailyAccountState extends State<DailyAccount> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Account result = Account(
                             category: _category,
                             ammount: int.parse(amountConroller.value.text),
                             date: DateFormat('yyyy-MM-dd').format(selectedDate),
                             content: contentConroller.value.text);
-                        widget.applicationservice.then((value) => {
-                              value.save(result)
-                              //value.deleteItem(
-                              //    DateFormat('yyyyMM').format(selectedDate),
-                              //    result)
-                            });
-                        Future.delayed(const Duration(milliseconds: 1000), () {
-                          setState(() {
-                            final String dateStr =
-                                DateFormat('yyyyMM').format(selectedDate);
-                            widget.db = widget.applicationservice
-                                .then((val) => val.load(dateStr));
-                          });
-                          Navigator.of(context).pop();
-                        });
+                        await widget.applicationservice
+                            .then((value) => {value.save(result)});
+                        _refreshAccount();
+                        Navigator.of(context).pop();
                       },
                       child: const Text(
                         '저장',
