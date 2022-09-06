@@ -17,11 +17,30 @@ class _DailyAccountState extends State<DailyAccount> {
   late TextEditingController amountConroller;
   DateTime selectedDate = DateTime.now();
   late String _category;
-  List<String> choices = <String>['Item 1', 'Item 2', 'Item 3'];
-  String _selectedChoices = 'Item 1';
-  void _select(String choice) {
-    setState(() {
-      _selectedChoices = choice;
+  List<String> choices = <String>['내역 수정', '삭제'];
+  void _select(String choice, Account data) async {
+    print(choice);
+    print(data.date);
+    if (choice == '삭제') {
+      widget.applicationservice.then((value) {
+        String date = data.date[0] +
+            data.date[1] +
+            data.date[2] +
+            data.date[3] +
+            data.date[5] +
+            data.date[6];
+        value.deleteItem(date, data);
+        refreshAccount();
+      });
+    }
+  }
+
+  void refreshAccount() {
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      setState(() {
+        widget.db = widget.applicationservice.then(
+            (value) => value.load(DateFormat('yyyyMM').format(selectedDate)));
+      });
     });
   }
 
@@ -81,7 +100,6 @@ class _DailyAccountState extends State<DailyAccount> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<dynamic> data = snapshot.data as List<dynamic>;
-
               data.sort((a, b) {
                 return a.date
                     .toString()
@@ -107,7 +125,9 @@ class _DailyAccountState extends State<DailyAccount> {
                         children: <Widget>[
                           Text(f.format(data[index].ammount).toString() + '원'),
                           PopupMenuButton(
-                            onSelected: _select,
+                            onSelected: (String value) async {
+                              _select(value, data[index]);
+                            },
                             padding: EdgeInsets.zero,
                             itemBuilder: (BuildContext context) {
                               return choices.map((String choice) {
@@ -150,7 +170,7 @@ class _DailyAccountState extends State<DailyAccount> {
         onPressed: () async {
           contentConroller = TextEditingController();
           amountConroller = TextEditingController();
-          await showDialog(
+          showDialog(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
