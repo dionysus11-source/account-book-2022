@@ -18,6 +18,18 @@ class AccountRepository implements IaccountRepository {
   String notionVersion = '';
 
   AccountRepository(this.notionKey, this.notionVersion);
+  void showToast(String message) {
+    if (Platform.isAndroid) {
+      Fluttertoast.showToast(
+          msg: message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: const Color.fromRGBO(217, 134, 74, 1),
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
 
   @override
   Future<List> load(String databaseId) async {
@@ -70,16 +82,7 @@ class AccountRepository implements IaccountRepository {
     });
     http.Response response = await http.post(uri, headers: headers, body: body);
     if (response.statusCode == 200) {
-      if (Platform.isAndroid) {
-        Fluttertoast.showToast(
-            msg: "Saved",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 1,
-            backgroundColor: const Color.fromRGBO(217, 134, 74, 1),
-            textColor: Colors.white,
-            fontSize: 16.0);
-      }
+      showToast('Saved');
     } else {
       throw Exception('can not get data from notion');
     }
@@ -133,6 +136,8 @@ class AccountRepository implements IaccountRepository {
     http.Response response = await http.delete(uri, headers: headers);
     if (response.statusCode != 200) {
       throw Exception('can not get data from notion');
+    } else {
+      showToast('Deleted');
     }
   }
 
@@ -168,6 +173,8 @@ class AccountRepository implements IaccountRepository {
         await http.patch(uri, headers: headers, body: body);
     if (response.statusCode != 200) {
       throw Exception('can not get data from notion');
+    } else {
+      showToast('Edit Success');
     }
   }
 }
