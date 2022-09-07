@@ -37,7 +37,6 @@ class _DailyAccountState extends State<DailyAccount> {
           builder: (BuildContext context) {
             return EditAlert(
                 title: '내역 수정',
-                selectedDate: selectedDate,
                 updateAccount: _refreshAccount,
                 db: widget.db,
                 applicationservice: widget.applicationservice,

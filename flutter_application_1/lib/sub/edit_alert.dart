@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../object/account.dart';
 import '../object/AccountApplicationService.dart';
+import 'package:intl/intl.dart';
 
 class EditAlert extends StatefulWidget {
   final String title;
-  final DateTime selectedDate;
   final void Function() updateAccount;
   Future<List> db;
   final Future<AccountApplicationService> applicationservice;
@@ -12,7 +12,6 @@ class EditAlert extends StatefulWidget {
   EditAlert(
       {Key? key,
       required this.title,
-      required this.selectedDate,
       required this.updateAccount,
       required this.db,
       required this.applicationservice,
@@ -24,6 +23,7 @@ class EditAlert extends StatefulWidget {
 
 class EditAlertState extends State<EditAlert> {
   late String _category;
+  late DateTime _toDate;
   void _onValueChange(String value) {
     setState(() {
       _category = value;
@@ -34,6 +34,7 @@ class EditAlertState extends State<EditAlert> {
   void initState() {
     super.initState();
     _category = widget.account.category;
+    _toDate = DateTime.parse(widget.account.date);
   }
 
   @override
@@ -45,7 +46,27 @@ class EditAlertState extends State<EditAlert> {
       content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
         const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
         Align(
-            alignment: Alignment.centerLeft, child: Text(widget.account.date)),
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            onPressed: () {
+              final selected = showDatePicker(
+                  context: context,
+                  initialDate: _toDate,
+                  firstDate: DateTime(2022),
+                  lastDate: DateTime(2030));
+              selected.then((dateTime) {
+                setState(() {
+                  _toDate = dateTime as DateTime;
+                });
+              });
+            },
+            child: Text(
+              DateFormat('yyyy-MM-dd').format(_toDate),
+              style: const TextStyle(color: Colors.black, fontSize: 15),
+            ),
+            style: TextButton.styleFrom(padding: const EdgeInsets.all(0)),
+          ),
+        ),
         const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
         MyDialog(
           initialValue: widget.account.category,
@@ -93,7 +114,7 @@ class EditAlertState extends State<EditAlert> {
             Account result = Account(
                 category: _category,
                 ammount: ammount,
-                date: widget.account.date,
+                date: DateFormat('yyyy-MM-dd').format(_toDate),
                 content: content);
             await widget.applicationservice
                 .then((value) => {value.editItem(widget.account, result)});
