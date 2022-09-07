@@ -34,7 +34,6 @@ class EditAlertState extends State<EditAlert> {
   Widget build(BuildContext context) {
     TextEditingController contentConroller = TextEditingController();
     TextEditingController amountConroller = TextEditingController();
-    _onValueChange(widget.account.category);
     return AlertDialog(
       title: Text(widget.title),
       content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
@@ -43,7 +42,7 @@ class EditAlertState extends State<EditAlert> {
             alignment: Alignment.centerLeft, child: Text(widget.account.date)),
         const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
         MyDialog(
-          initialValue: _category,
+          initialValue: widget.account.category,
           onValueChange: _onValueChange,
         ),
         const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
