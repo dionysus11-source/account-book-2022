@@ -150,20 +150,6 @@ class _DailyAccountState extends State<DailyAccount> {
                           )
                         ],
                       ),
-
-                      //Text(f.format(data[index].ammount).toString() + '원'),
-                      /*PopupMenuButton(
-                          onSelected: _select,
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (BuildContext context) {
-                            return choices.map((String choice) {
-                              return PopupMenuItem<String>(
-                                value: choice,
-                                child: Text(choice),
-                              );
-                            }).toList();
-                          },
-                        )*/
                     ),
                   );
                 },
@@ -183,64 +169,87 @@ class _DailyAccountState extends State<DailyAccount> {
           showDialog(
               context: context,
               builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('내역 추가'),
-                  content:
-                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
-                    Align(
+                return StatefulBuilder(builder: (context, setState) {
+                  return AlertDialog(
+                    title: const Text('내역 추가'),
+                    content: Column(mainAxisSize: MainAxisSize.min, children: <
+                        Widget>[
+                      const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
+                      Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                            DateFormat('yyyy-MM-dd').format(selectedDate))),
-                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
-                    MyDialog(
-                      onValueChange: _onValueChange,
-                      initialValue: _category,
-                    ),
-                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
-                    TextField(
-                        controller: contentConroller,
-                        keyboardType: TextInputType.text,
+                        child: TextButton(
+                          onPressed: () {
+                            final selected = showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime(2022),
+                                lastDate: DateTime(2030));
+                            selected.then((dateTime) {
+                              setState(() {
+                                selectedDate = dateTime as DateTime;
+                              });
+                            });
+                          },
+                          child: Text(
+                            DateFormat('yyyy-MM-dd').format(selectedDate),
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 16),
+                          ),
+                          style: TextButton.styleFrom(
+                              padding: const EdgeInsets.all(0)),
+                        ),
+                      ),
+                      const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
+                      MyDialog(
+                        onValueChange: _onValueChange,
+                        initialValue: _category,
+                      ),
+                      const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
+                      TextField(
+                          controller: contentConroller,
+                          keyboardType: TextInputType.text,
+                          decoration: const InputDecoration(
+                              hintText: '내용', border: InputBorder.none)),
+                      const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
+                      TextField(
+                        controller: amountConroller,
+                        keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                            hintText: '내용', border: InputBorder.none)),
-                    const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
-                    TextField(
-                      controller: amountConroller,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                          hintText: '금액', border: InputBorder.none),
-                    ),
-                  ]),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text(
-                        '취소',
-                        style: TextStyle(color: Colors.black),
+                            hintText: '금액', border: InputBorder.none),
                       ),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        Account result = Account(
-                            category: _category,
-                            ammount: int.parse(amountConroller.value.text),
-                            date: DateFormat('yyyy-MM-dd').format(selectedDate),
-                            content: contentConroller.value.text);
-                        await widget.applicationservice
-                            .then((value) => {value.save(result)});
-                        _refreshAccount();
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text(
-                        '저장',
-                        style:
-                            TextStyle(color: Color.fromRGBO(217, 134, 74, 1)),
+                    ]),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text(
+                          '취소',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
-                    ),
-                  ],
-                );
+                      TextButton(
+                        onPressed: () async {
+                          Account result = Account(
+                              category: _category,
+                              ammount: int.parse(amountConroller.value.text),
+                              date:
+                                  DateFormat('yyyy-MM-dd').format(selectedDate),
+                              content: contentConroller.value.text);
+                          await widget.applicationservice
+                              .then((value) => {value.save(result)});
+                          _refreshAccount();
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text(
+                          '저장',
+                          style:
+                              TextStyle(color: Color.fromRGBO(217, 134, 74, 1)),
+                        ),
+                      ),
+                    ],
+                  );
+                });
               });
         },
         child: const Icon(
