@@ -62,7 +62,7 @@ class EditAlertState extends State<EditAlert> {
             },
             child: Text(
               DateFormat('yyyy-MM-dd').format(_toDate),
-              style: const TextStyle(color: Colors.black, fontSize: 15),
+              style: const TextStyle(color: Colors.black, fontSize: 16),
             ),
             style: TextButton.styleFrom(padding: const EdgeInsets.all(0)),
           ),
