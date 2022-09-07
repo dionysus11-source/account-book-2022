@@ -34,7 +34,7 @@ class EditAlertState extends State<EditAlert> {
   Widget build(BuildContext context) {
     TextEditingController contentConroller = TextEditingController();
     TextEditingController amountConroller = TextEditingController();
-
+    _onValueChange(widget.account.category);
     return AlertDialog(
       title: Text(widget.title),
       content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
@@ -50,14 +50,15 @@ class EditAlertState extends State<EditAlert> {
         TextField(
             controller: contentConroller,
             keyboardType: TextInputType.text,
-            decoration: const InputDecoration(
-                hintText: '내용', border: InputBorder.none)),
+            decoration: InputDecoration(
+                hintText: widget.account.content, border: InputBorder.none)),
         const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
         TextField(
           controller: amountConroller,
           keyboardType: TextInputType.number,
-          decoration:
-              const InputDecoration(hintText: '금액', border: InputBorder.none),
+          decoration: InputDecoration(
+              hintText: widget.account.ammount.toString(),
+              border: InputBorder.none),
         ),
       ]),
       actions: <Widget>[
@@ -72,19 +73,27 @@ class EditAlertState extends State<EditAlert> {
         ),
         TextButton(
           onPressed: () async {
+            final int ammount;
+            final String content;
+            if (amountConroller.value.text == '') {
+              ammount = widget.account.ammount;
+            } else {
+              ammount = int.parse(amountConroller.value.text);
+            }
+            if (contentConroller.value.text == '') {
+              content = widget.account.content;
+            } else {
+              content = contentConroller.value.text;
+            }
             Account result = Account(
                 category: _category,
-                ammount: int.parse(amountConroller.value.text),
+                ammount: ammount,
                 date: widget.account.date,
-                content: contentConroller.value.text);
+                content: content);
             await widget.applicationservice
                 .then((value) => {value.editItem(widget.account, result)});
             widget.updateAccount();
-            //Future.delayed(const Duration(milliseconds: 1000), () {
-            // widget.db =
-            ////      widget.applicationservice.then((val) => val.load(dateStr));
             Navigator.of(context).pop();
-            //});
           },
           child: const Text(
             '저장',
