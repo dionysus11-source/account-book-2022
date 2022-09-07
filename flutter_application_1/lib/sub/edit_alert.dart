@@ -23,11 +23,17 @@ class EditAlert extends StatefulWidget {
 }
 
 class EditAlertState extends State<EditAlert> {
-  String _category = '식비';
+  late String _category;
   void _onValueChange(String value) {
     setState(() {
       _category = value;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _category = widget.account.category;
   }
 
   @override
