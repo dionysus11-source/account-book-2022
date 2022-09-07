@@ -23,7 +23,7 @@ class EditAlert extends StatefulWidget {
 }
 
 class EditAlertState extends State<EditAlert> {
-  String _category = '식비';
+  late String _category;
   void _onValueChange(String value) {
     setState(() {
       _category = value;
@@ -31,10 +31,15 @@ class EditAlertState extends State<EditAlert> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _category = widget.account.category;
+  }
+
+  @override
   Widget build(BuildContext context) {
     TextEditingController contentConroller = TextEditingController();
     TextEditingController amountConroller = TextEditingController();
-    _onValueChange(widget.account.category);
     return AlertDialog(
       title: Text(widget.title),
       content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
@@ -43,7 +48,7 @@ class EditAlertState extends State<EditAlert> {
             alignment: Alignment.centerLeft, child: Text(widget.account.date)),
         const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
         MyDialog(
-          initialValue: _category,
+          initialValue: widget.account.category,
           onValueChange: _onValueChange,
         ),
         const Divider(color: Color.fromRGBO(251, 251, 251, 1)),
