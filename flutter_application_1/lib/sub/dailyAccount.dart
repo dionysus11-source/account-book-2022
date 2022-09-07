@@ -46,7 +46,7 @@ class _DailyAccountState extends State<DailyAccount> {
   }
 
   void _refreshAccount() {
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(milliseconds: 1500), () {
       setState(() {
         widget.db = widget.applicationservice.then(
             (value) => value.load(DateFormat('yyyyMM').format(selectedDate)));
