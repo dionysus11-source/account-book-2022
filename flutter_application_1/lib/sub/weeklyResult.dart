@@ -140,6 +140,26 @@ class _WeeklyResultState extends State<WeeklyResult> {
               // gradientList: ---To add gradient colors---
               // emptyColorGradient: ---Empty Color gradient---
             ),
+            Text(selectedDate.month.toString() +
+                '월 ' +
+                getWeek(selectedDate).toString() +
+                '주 : ' +
+                weeklyDataMap.values
+                    .reduce(
+                      (value, element) => value + element,
+                    )
+                    .toInt()
+                    .toString() +
+                '만원, ' +
+                selectedDate.month.toString() +
+                '월 합계: ' +
+                monthlyDataMap.values
+                    .reduce(
+                      (value, element) => value + element,
+                    )
+                    .toInt()
+                    .toString() +
+                '만원'),
             const SizedBox(height: 30),
             Expanded(
               child: ListView.builder(
