@@ -24,40 +24,50 @@ class _WeeklyResultState extends State<WeeklyResult> {
     return ret;
   }
 
-  Map<String, double> calcMap(Future<List> data) {
+  Map<String, double> calcWeekMap(List data) {
     Map<String, double> temp = {'식비': 0};
     int week = getWeek(selectedDate);
-    data.then((value) {
-      value.forEach((element) {
-        int elementWeek = getWeek(DateTime.parse(element.date));
-        if (elementWeek == week) {
-          temp.update(element.category, (value) => value + element.ammount,
-              ifAbsent: () => element.ammount.toDouble());
-        }
-      });
-      temp.forEach((key, value) {
-        temp.update(key, (value) => value / 10000);
-      });
-      return temp;
+    data.forEach((element) {
+      int elementWeek = getWeek(DateTime.parse(element.date));
+      if (elementWeek == week) {
+        temp.update(element.category, (value) => value + element.ammount,
+            ifAbsent: () => element.ammount.toDouble());
+      }
+    });
+    temp.forEach((key, value) {
+      temp.update(key, (value) => value / 10000);
     });
     return temp;
   }
 
-  updateMap(Future<List> data) {
+  Map<String, double> calcMonthMap(List data) {
+    Map<String, double> temp = {'식비': 0};
+    data.forEach((element) {
+      temp.update(element.category, (value) => value + element.ammount,
+          ifAbsent: () => element.ammount.toDouble());
+    });
+    temp.forEach((key, value) {
+      temp.update(key, (value) => value / 10000);
+    });
+    return temp;
+  }
+
+  updateMap(List data) {
     setState(() {
-      dataMap = calcMap(data);
+      dataMap = calcWeekMap(data);
     });
   }
 
   @override
   void initState() {
     super.initState();
-    updateMap(widget.db);
+    widget.db.then((value) {
+      updateMap(value);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    print('build is called');
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -78,14 +88,14 @@ class _WeeklyResultState extends State<WeeklyResult> {
                   lastDate: DateTime(2030));
               late Future<List> newData;
               selected.then((dateTime) {
-                setState(() {
-                  selectedDate = dateTime as DateTime;
-                  final String dateStr =
-                      DateFormat('yyyyMM').format(selectedDate);
-                  newData = widget.applicationservice
-                      .then((val) => val.load(dateStr));
+                selectedDate = dateTime as DateTime;
+                final String dateStr =
+                    DateFormat('yyyyMM').format(selectedDate);
+                newData =
+                    widget.applicationservice.then((val) => val.load(dateStr));
+                newData.then((value) {
+                  updateMap(value);
                 });
-                updateMap(newData);
                 // 가계부 리스트  업데이트 추가
               });
             },
