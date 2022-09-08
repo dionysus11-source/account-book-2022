@@ -23,26 +23,35 @@ class _WeeklyResultState extends State<WeeklyResult> {
     return ret;
   }
 
-  void calcMap() {
+  Map<String, double> calcMap() {
+    Map<String, double> temp = {'식비': 0};
     int week = getWeek(selectedDate);
     widget.db.then((value) {
       value.forEach((element) {
         int elementWeek = getWeek(DateTime.parse(element.date));
         if (elementWeek == week) {
-          dataMap.update(element.category, (value) => value + element.ammount,
+          temp.update(element.category, (value) => value + element.ammount,
               ifAbsent: () => element.ammount.toDouble());
         }
       });
-      dataMap.forEach((key, value) {
-        dataMap.update(key, (value) => value / 10000);
+      temp.forEach((key, value) {
+        temp.update(key, (value) => value / 10000);
       });
+      return temp;
+    });
+    return temp;
+  }
+
+  updateMap() {
+    setState(() {
+      dataMap = calcMap();
     });
   }
 
   @override
   void initState() {
     super.initState();
-    calcMap();
+    updateMap();
   }
 
   @override
