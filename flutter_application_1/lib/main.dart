@@ -100,22 +100,6 @@ class _MyHomePageState extends State<MyHomePage>
           WeeklyResult(db: db, applicationservice: applicationservice)
         ],
       )),
-      /* TabBarView(children: <Widget>[
-        DailyAccount(
-            db: widget.db, applicationservice: widget.applicationservice),
-        WeeklyResult(
-            db: widget.db, applicationservice: widget.applicationservice)
-      ], controller: controller),*/
-      /*bottomNavigationBar: TabBar(
-        tabs: <Tab>[
-          Tab(
-              icon:
-                  Image.asset('assets/icon/daily.png', width: 24, height: 24)),
-          Tab(icon: Image.asset('assets/icon/daily.png', width: 24, height: 24))
-        ],
-        controller: controller,
-        indicatorColor: const Color.fromRGBO(254, 110, 14, 1),
-      ),*/
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

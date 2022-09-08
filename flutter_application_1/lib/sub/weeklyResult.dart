@@ -50,7 +50,9 @@ class _WeeklyResultState extends State<WeeklyResult> {
     temp.forEach((key, value) {
       temp.update(key, (value) => value / 10000);
     });
-    return temp;
+    var sortMapByValue = Map.fromEntries(
+        temp.entries.toList()..sort((e1, e2) => e2.value.compareTo(e1.value)));
+    return sortMapByValue;
   }
 
   updateMaps(List data) {
@@ -139,7 +141,24 @@ class _WeeklyResultState extends State<WeeklyResult> {
               // emptyColorGradient: ---Empty Color gradient---
             ),
             const SizedBox(height: 30),
-            Text(selectedDate.month.toString() + '월 종합 지출 내역'),
+            Expanded(
+              child: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  controller: ScrollController(),
+                  itemCount: monthlyDataMap.length,
+                  itemBuilder: (context, index) {
+                    String key = monthlyDataMap.keys.elementAt(index);
+                    String month = selectedDate.month.toString() + '월';
+                    return Card(
+                      child: ListTile(
+                        leading: Text(month),
+                        title: Text(key),
+                        trailing: Text(monthlyDataMap[key].toString() + ' 만원'),
+                        //title: Text('test'),
+                      ),
+                    );
+                  }),
+            )
           ],
         ));
   }
