@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../object/AccountApplicationService.dart';
 import '../object/account.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:intl/intl.dart';
 
 class WeeklyResult extends StatefulWidget {
   final Future<List> db;
@@ -23,10 +24,10 @@ class _WeeklyResultState extends State<WeeklyResult> {
     return ret;
   }
 
-  Map<String, double> calcMap() {
+  Map<String, double> calcMap(Future<List> data) {
     Map<String, double> temp = {'식비': 0};
     int week = getWeek(selectedDate);
-    widget.db.then((value) {
+    data.then((value) {
       value.forEach((element) {
         int elementWeek = getWeek(DateTime.parse(element.date));
         if (elementWeek == week) {
@@ -42,21 +43,59 @@ class _WeeklyResultState extends State<WeeklyResult> {
     return temp;
   }
 
-  updateMap() {
+  updateMap(Future<List> data) {
     setState(() {
-      dataMap = calcMap();
+      dataMap = calcMap(data);
     });
   }
 
   @override
   void initState() {
     super.initState();
-    updateMap();
+    updateMap(widget.db);
   }
 
   @override
   Widget build(BuildContext context) {
+    print('build is called');
     return Scaffold(
+      appBar: AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '가계부',
+          style: TextStyle(color: Colors.black),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              final selected = showDatePicker(
+                  context: context,
+                  initialDate: selectedDate,
+                  firstDate: DateTime(2022),
+                  lastDate: DateTime(2030));
+              late Future<List> newData;
+              selected.then((dateTime) {
+                setState(() {
+                  selectedDate = dateTime as DateTime;
+                  final String dateStr =
+                      DateFormat('yyyyMM').format(selectedDate);
+                  newData = widget.applicationservice
+                      .then((val) => val.load(dateStr));
+                });
+                updateMap(newData);
+                // 가계부 리스트  업데이트 추가
+              });
+            },
+            child: Text(
+              DateFormat('yyyy-MM-dd').format(selectedDate),
+              style: const TextStyle(color: Colors.black),
+            ),
+          )
+        ],
+      ),
       body: PieChart(
         dataMap: dataMap,
         animationDuration: const Duration(milliseconds: 800),
