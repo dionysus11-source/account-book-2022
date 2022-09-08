@@ -33,6 +33,9 @@ class _WeeklyResultState extends State<WeeklyResult> {
               ifAbsent: () => element.ammount.toDouble());
         }
       });
+      dataMap.forEach((key, value) {
+        dataMap.update(key, (value) => value / 10000);
+      });
     });
   }
 
@@ -49,7 +52,7 @@ class _WeeklyResultState extends State<WeeklyResult> {
         dataMap: dataMap,
         animationDuration: const Duration(milliseconds: 800),
         chartLegendSpacing: 32,
-        chartRadius: MediaQuery.of(context).size.width / 3.2,
+        chartRadius: MediaQuery.of(context).size.width / 2.5,
         initialAngleInDegree: 0,
         chartType: ChartType.ring,
         ringStrokeWidth: 32,
@@ -58,7 +61,7 @@ class _WeeklyResultState extends State<WeeklyResult> {
           legendPosition: LegendPosition.bottom,
           showLegends: true,
           legendTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.normal,
           ),
         ),
         chartValuesOptions: const ChartValuesOptions(
