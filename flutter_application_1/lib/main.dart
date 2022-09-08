@@ -123,8 +123,8 @@ class _MyHomePageState extends State<MyHomePage>
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
+            icon: Icon(Icons.addchart),
+            label: 'Chart',
           ),
         ],
         currentIndex: _selectedIndex,
