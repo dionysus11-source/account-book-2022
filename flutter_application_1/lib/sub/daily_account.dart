@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-import '../object/AccountApplicationService.dart';
+import '../object/account_application_service.dart';
 import '../object/account.dart';
 import 'package:intl/intl.dart';
 import './edit_alert.dart';
 
 class DailyAccount extends StatefulWidget {
-  Future<List> db;
-  Future<AccountApplicationService> applicationservice;
-  DailyAccount({Key? key, required this.db, required this.applicationservice})
+  final Future<List> db;
+  final Future<AccountApplicationService> applicationservice;
+  final void Function() refreshAccount;
+  const DailyAccount(
+      {Key? key,
+      required this.db,
+      required this.applicationservice,
+      required this.refreshAccount})
       : super(key: key);
   @override
   _DailyAccountState createState() => _DailyAccountState();
@@ -22,36 +27,23 @@ class _DailyAccountState extends State<DailyAccount> {
   void _select(String choice, Account data) async {
     if (choice == '삭제') {
       await widget.applicationservice.then((value) {
-        String date = data.date[0] +
-            data.date[1] +
-            data.date[2] +
-            data.date[3] +
-            data.date[5] +
-            data.date[6];
         value.deleteItem(data);
       });
-      _refreshAccount();
+      widget.refreshAccount();
     } else if (choice == '내역 수정') {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return EditAlert(
-                title: '내역 수정',
-                updateAccount: _refreshAccount,
-                db: widget.db,
-                applicationservice: widget.applicationservice,
-                account: data);
-          });
-    }
-  }
-
-  void _refreshAccount() {
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      setState(() {
-        widget.db = widget.applicationservice.then(
-            (value) => value.load(DateFormat('yyyyMM').format(selectedDate)));
+      widget.db.then((db) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return EditAlert(
+                  title: '내역 수정',
+                  updateAccount: widget.refreshAccount,
+                  db: db,
+                  applicationservice: widget.applicationservice,
+                  account: data);
+            });
       });
-    });
+    }
   }
 
   @override
@@ -91,8 +83,7 @@ class _DailyAccountState extends State<DailyAccount> {
                   selectedDate = dateTime as DateTime;
                   final String dateStr =
                       DateFormat('yyyyMM').format(selectedDate);
-                  widget.db = widget.applicationservice
-                      .then((val) => val.load(dateStr));
+                  widget.refreshAccount();
                 });
                 // 가계부 리스트  업데이트 추가
               });
@@ -104,8 +95,7 @@ class _DailyAccountState extends State<DailyAccount> {
           )
         ],
       ),
-      body: Container(
-          child: Center(
+      body: Center(
         child: FutureBuilder(
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -160,7 +150,7 @@ class _DailyAccountState extends State<DailyAccount> {
           },
           future: widget.db,
         ),
-      )),
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromRGBO(254, 110, 14, 1),
         onPressed: () async {
@@ -238,7 +228,7 @@ class _DailyAccountState extends State<DailyAccount> {
                               content: contentConroller.value.text);
                           await widget.applicationservice
                               .then((value) => {value.save(result)});
-                          _refreshAccount();
+                          widget.refreshAccount();
                           Navigator.of(context).pop();
                         },
                         child: const Text(
@@ -262,7 +252,9 @@ class _DailyAccountState extends State<DailyAccount> {
 }
 
 class MyDialog extends StatefulWidget {
-  const MyDialog({required this.onValueChange, required this.initialValue});
+  const MyDialog(
+      {Key? key, required this.onValueChange, required this.initialValue})
+      : super(key: key);
 
   final String initialValue;
   final void Function(String) onValueChange;
