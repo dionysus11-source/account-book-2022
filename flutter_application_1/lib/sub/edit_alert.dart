@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import '../object/account.dart';
-import '../object/AccountApplicationService.dart';
+import '../object/account_application_service.dart';
 import 'package:intl/intl.dart';
 
 class EditAlert extends StatefulWidget {
   final String title;
   final void Function() updateAccount;
-  Future<List> db;
+  final List db;
   final Future<AccountApplicationService> applicationservice;
   final Account account;
-  EditAlert(
+  const EditAlert(
       {Key? key,
       required this.title,
       required this.updateAccount,
@@ -133,7 +133,9 @@ class EditAlertState extends State<EditAlert> {
 
 class MyDialog extends StatefulWidget {
   final void Function(String) onValueChange;
-  const MyDialog({required this.initialValue, required this.onValueChange});
+  const MyDialog(
+      {Key? key, required this.initialValue, required this.onValueChange})
+      : super(key: key);
   final String initialValue;
 
   @override

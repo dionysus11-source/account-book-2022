@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/sub/DailyAccount.dart';
 import './repository/account_repository.dart';
-import './object/AccountApplicationService.dart';
+import './object/account_application_service.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
-import 'sub/DailyAccount.dart';
+import 'sub/daily_account.dart';
 import 'sub/WeeklyResult.dart';
 import 'dart:async';
 
@@ -83,6 +82,15 @@ class _MyHomePageState extends State<MyHomePage>
     super.dispose();
   }
 
+  void _refreshAccount() {
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      setState(() {
+        db = applicationservice.then(
+            (value) => value.load(DateFormat('yyyyMM').format(selectedDate)));
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -96,7 +104,10 @@ class _MyHomePageState extends State<MyHomePage>
           child: IndexedStack(
         index: _selectedIndex,
         children: <Widget>[
-          DailyAccount(db: db, applicationservice: applicationservice),
+          DailyAccount(
+              db: db,
+              applicationservice: applicationservice,
+              refreshAccount: _refreshAccount),
           WeeklyResult(db: db, applicationservice: applicationservice)
         ],
       )),

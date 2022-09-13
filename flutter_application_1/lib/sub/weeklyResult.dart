@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../object/AccountApplicationService.dart';
-import '../object/account.dart';
+import '../object/account_application_service.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:intl/intl.dart';
 
@@ -28,13 +27,13 @@ class _WeeklyResultState extends State<WeeklyResult> {
   Map<String, double> calcWeekMap(List data) {
     Map<String, double> temp = {'식비': 0};
     int week = getWeek(selectedDate);
-    data.forEach((element) {
+    for (var element in data) {
       int elementWeek = getWeek(DateTime.parse(element.date));
       if (elementWeek == week) {
         temp.update(element.category, (value) => value + element.ammount,
             ifAbsent: () => element.ammount.toDouble());
       }
-    });
+    }
     temp.forEach((key, value) {
       temp.update(key, (value) => value / 10000);
     });
@@ -43,10 +42,10 @@ class _WeeklyResultState extends State<WeeklyResult> {
 
   Map<String, double> calcMonthMap(List data) {
     Map<String, double> temp = {'식비': 0};
-    data.forEach((element) {
+    for (var element in data) {
       temp.update(element.category, (value) => value + element.ammount,
           ifAbsent: () => element.ammount.toDouble());
-    });
+    }
     temp.forEach((key, value) {
       temp.update(key, (value) => value / 10000);
     });
@@ -140,26 +139,29 @@ class _WeeklyResultState extends State<WeeklyResult> {
               // gradientList: ---To add gradient colors---
               // emptyColorGradient: ---Empty Color gradient---
             ),
-            Text(selectedDate.month.toString() +
-                '월 ' +
-                getWeek(selectedDate).toString() +
-                '주 : ' +
-                weeklyDataMap.values
-                    .reduce(
-                      (value, element) => value + element,
-                    )
-                    .toInt()
-                    .toString() +
-                '만원, ' +
-                selectedDate.month.toString() +
-                '월 합계: ' +
-                monthlyDataMap.values
-                    .reduce(
-                      (value, element) => value + element,
-                    )
-                    .toInt()
-                    .toString() +
-                '만원'),
+            Text(
+              selectedDate.month.toString() +
+                  '월 ' +
+                  getWeek(selectedDate).toString() +
+                  '주 : ' +
+                  weeklyDataMap.values
+                      .reduce(
+                        (value, element) => value + element,
+                      )
+                      .toInt()
+                      .toString() +
+                  '만원, ' +
+                  selectedDate.month.toString() +
+                  '월 합계: ' +
+                  monthlyDataMap.values
+                      .reduce(
+                        (value, element) => value + element,
+                      )
+                      .toInt()
+                      .toString() +
+                  '만원',
+              style: const TextStyle(color: Color.fromRGBO(254, 110, 14, 1)),
+            ),
             const SizedBox(height: 30),
             Expanded(
               child: ListView.builder(
