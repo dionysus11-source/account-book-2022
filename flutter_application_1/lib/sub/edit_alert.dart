@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 class EditAlert extends StatefulWidget {
   final String title;
-  final void Function() updateAccount;
+  final void Function(DateTime selected) updateAccount;
   final List db;
   final Future<AccountApplicationService> applicationservice;
   final Account account;
@@ -118,7 +118,7 @@ class EditAlertState extends State<EditAlert> {
                 content: content);
             await widget.applicationservice
                 .then((value) => {value.editItem(widget.account, result)});
-            widget.updateAccount();
+            widget.updateAccount(_toDate);
             Navigator.of(context).pop();
           },
           child: const Text(

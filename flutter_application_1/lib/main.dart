@@ -82,11 +82,11 @@ class _MyHomePageState extends State<MyHomePage>
     super.dispose();
   }
 
-  void _refreshAccount() {
+  void _refreshAccount(DateTime selected) {
     Future.delayed(const Duration(milliseconds: 1500), () {
       setState(() {
-        db = applicationservice.then(
-            (value) => value.load(DateFormat('yyyyMM').format(selectedDate)));
+        db = applicationservice
+            .then((value) => value.load(DateFormat('yyyyMM').format(selected)));
       });
     });
   }
