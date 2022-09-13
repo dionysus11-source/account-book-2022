@@ -81,8 +81,6 @@ class _DailyAccountState extends State<DailyAccount> {
               selected.then((dateTime) {
                 setState(() {
                   selectedDate = dateTime as DateTime;
-                  final String dateStr =
-                      DateFormat('yyyyMM').format(selectedDate);
                   widget.refreshAccount(selectedDate);
                 });
                 // 가계부 리스트  업데이트 추가
