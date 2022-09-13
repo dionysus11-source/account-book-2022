@@ -42,6 +42,7 @@ class AccountRepository implements IaccountRepository {
     };
     http.Response response = await http.post(uri, headers: headers);
     if (response.statusCode == 200) {
+      showToast('Loaded!');
       var ret = json
           .decode(response.body)['results']
           .map((e) => Account.fromJson(e))
