@@ -107,42 +107,49 @@ class _DailyAccountState extends State<DailyAccount> {
               data = data.reversed.toList();
               int length = data.length;
               var f = NumberFormat('###,###,###,###');
-              return ListView.builder(
-                controller: ScrollController(),
-                itemBuilder: (context, index) {
-                  return Card(
-                    elevation: 5,
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    child: ListTile(
-                      title: Text(data[index].content),
-                      subtitle: Text(data[index].category),
-                      leading: Text(data[index].date),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(f.format(data[index].ammount).toString() + '원'),
-                          PopupMenuButton(
-                            onSelected: (String value) async {
-                              _select(value, data[index]);
-                            },
-                            padding: EdgeInsets.zero,
-                            itemBuilder: (BuildContext context) {
-                              return choices.map((String choice) {
-                                return PopupMenuItem<String>(
-                                  value: choice,
-                                  child: Text(choice),
-                                );
-                              }).toList();
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                itemCount: length,
-              );
+              return RefreshIndicator(
+                  child: ListView.builder(
+                    controller: ScrollController(),
+                    itemBuilder: (context, index) {
+                      return Card(
+                        elevation: 5,
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: ListTile(
+                          title: Text(data[index].content),
+                          subtitle: Text(data[index].category),
+                          leading: Text(data[index].date),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(f.format(data[index].ammount).toString() +
+                                  '원'),
+                              PopupMenuButton(
+                                onSelected: (String value) async {
+                                  _select(value, data[index]);
+                                },
+                                padding: EdgeInsets.zero,
+                                itemBuilder: (BuildContext context) {
+                                  return choices.map((String choice) {
+                                    return PopupMenuItem<String>(
+                                      value: choice,
+                                      child: Text(choice),
+                                    );
+                                  }).toList();
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    itemCount: length,
+                  ),
+                  onRefresh: () {
+                    return Future.delayed(const Duration(seconds: 1), () {
+                      widget.refreshAccount(selectedDate);
+                    });
+                  });
             }
             return const Text('No data');
           },
