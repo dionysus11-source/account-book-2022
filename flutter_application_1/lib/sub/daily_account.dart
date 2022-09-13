@@ -7,7 +7,7 @@ import './edit_alert.dart';
 class DailyAccount extends StatefulWidget {
   final Future<List> db;
   final Future<AccountApplicationService> applicationservice;
-  final void Function() refreshAccount;
+  final void Function(DateTime selected) refreshAccount;
   const DailyAccount(
       {Key? key,
       required this.db,
@@ -29,7 +29,7 @@ class _DailyAccountState extends State<DailyAccount> {
       await widget.applicationservice.then((value) {
         value.deleteItem(data);
       });
-      widget.refreshAccount();
+      widget.refreshAccount(selectedDate);
     } else if (choice == '내역 수정') {
       widget.db.then((db) {
         showDialog(
@@ -83,7 +83,7 @@ class _DailyAccountState extends State<DailyAccount> {
                   selectedDate = dateTime as DateTime;
                   final String dateStr =
                       DateFormat('yyyyMM').format(selectedDate);
-                  widget.refreshAccount();
+                  widget.refreshAccount(selectedDate);
                 });
                 // 가계부 리스트  업데이트 추가
               });
@@ -228,7 +228,7 @@ class _DailyAccountState extends State<DailyAccount> {
                               content: contentConroller.value.text);
                           await widget.applicationservice
                               .then((value) => {value.save(result)});
-                          widget.refreshAccount();
+                          widget.refreshAccount(selectedDate);
                           Navigator.of(context).pop();
                         },
                         child: const Text(
